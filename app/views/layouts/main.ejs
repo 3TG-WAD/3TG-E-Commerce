@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Shop.co - Your Fashion Destination">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/stylesheet.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@700&family=Roboto+Slab:wght@700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const styleSheets = document.styleSheets;
+            console.log('Loaded stylesheets:', styleSheets.length);
+            for(let i = 0; i < styleSheets.length; i++) {
+                console.log(`Stylesheet ${i}:`, styleSheets[i].href);
+            }
+        });
+    </script>
+</head>
+<body class="font-sans antialiased">
+    <%- include('../partials/header') %>
+    <div class="min-h-screen">
+        <%- body %>
+    </div>
+    <%- include('../partials/footer') %>
+    <script src="/js/main.js"></script>
+</body>
+</html> 

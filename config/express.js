@@ -1,35 +1,27 @@
+// config/express.js
 const express = require('express');
-const config = require('./config');
+const engine = require('ejs-mate');
+const compression = require('compression');
+const helmet = require('helmet');
+const cache = require('../app/middleware/cache');
+const landingRoutes = require('../app/routes/landing.routes');
 
 const configureExpress = (app) => {
+  // Template engine
+  app.engine('ejs', engine);
+  app.set('view engine', 'ejs');
+  app.set('views', './app/views');
+
   // Middleware
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+  app.use(express.static('public'));
+  app.use(compression());
+  app.use(helmet({
+    contentSecurityPolicy: false
+  }));
+  app.use(cache(86400)); // 24 hours cache
 
-  // Security headers
-  app.use((req, res, next) => {
-    res.header('X-Content-Type-Options', 'nosniff');
-    res.header('X-Frame-Options', 'DENY');
-    res.header('X-XSS-Protection', '1; mode=block');
-    next();
-  });
-
-  // Basic route
-  app.get('/', (req, res) => {
-    res.json({ 
-      message: 'Welcome to the API',
-      environment: config.env 
-    });
-  });
-
-  // Error handling middleware
-  app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({
-      error: 'Something went wrong!',
-      message: config.env === 'development' ? err.message : undefined
-    });
-  });
+  // Landing page route
+  app.use('/', landingRoutes);
 };
 
 module.exports = configureExpress;

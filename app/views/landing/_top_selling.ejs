@@ -1,0 +1,41 @@
+<section class="py-16 bg-white">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold mb-12 text-center">TOP SELLING</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <% const topProducts = [
+        {name: 'Vertical Striped Shirt', price: 212, oldPrice: 232, image: 'https://placehold.co/300x300', rating: 4.5, reviews: 120},
+        {name: 'Courage Graphic T-shirt', price: 145, image: 'https://placehold.co/300x300', rating: 4.8, reviews: 150},
+        {name: 'Loose Fit Bermuda Shorts', price: 80, image: 'https://placehold.co/300x300', rating: 4.2, reviews: 55},
+        {name: 'Faded Skinny Jeans', price: 210, image: 'https://placehold.co/300x300', rating: 4.7, reviews: 88}
+      ] %>
+      
+      <% topProducts.forEach(product => { %>
+        <div class="bg-white rounded-lg shadow-sm p-4">
+          <img src="<%= product.image %>" alt="<%= product.name %>" class="w-full h-64 object-cover mb-4 rounded">
+          <h3 class="font-semibold mb-2"><%= product.name %></h3>
+          <div class="flex items-center mb-2">
+            <div class="flex text-yellow-400">
+              <% for(let i = 0; i < 5; i++) { %>
+                <svg class="w-4 h-4 <%= i < Math.floor(product.rating) ? 'fill-current' : 'text-gray-300' %>" viewBox="0 0 20 20">
+                  <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                </svg>
+              <% } %>
+            </div>
+            <span class="text-sm text-gray-500 ml-2">(<%= product.reviews %>)</span>
+          </div>
+          <div class="flex items-center">
+            <span class="text-lg font-bold">$<%= product.price %></span>
+            <% if (product.oldPrice) { %>
+              <span class="ml-2 text-gray-400 line-through">$<%= product.oldPrice %></span>
+            <% } %>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+    <div class="text-center mt-8">
+      <button class="border border-black px-8 py-2 rounded-full hover:bg-black hover:text-white">
+        View All
+      </button>
+    </div>
+  </div>
+</section> 
