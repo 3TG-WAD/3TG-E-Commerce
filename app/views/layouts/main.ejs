@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">
+            <a href="/">
+                <i class="fas fa-store"></i>
+                3TG E-Commerce
+            </a>
+        </div>
+        <nav class="main-nav">
+            <div class="search-bar">
+                <input type="text" placeholder="Search products...">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+            <% if (locals.user) { %>
+                <div class="user-menu">
+                    <span class="user-info">
+                        <img src="<%= user.avatar %>" alt="Avatar" class="avatar">
+                        <%= user.username %>
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                    <div class="dropdown-menu">
+                        <div class="user-header">
+                            <img src="<%= user.avatar %>" alt="Avatar">
+                            <div>
+                                <strong><%= user.username %></strong>
+                                <small><%= user.email %></small>
+                            </div>
+                        </div>
+                        <div class="menu-items">
+                            <a href="/profile">
+                                <i class="fas fa-user-circle"></i> Profile
+                            </a>
+                            <a href="/orders">
+                                <i class="fas fa-shopping-bag"></i> Orders
+                            </a>
+                            <% if (user.role === 'admin') { %>
+                                <a href="/admin" class="admin-link">
+                                    <i class="fas fa-cog"></i> Admin Panel
+                                </a>
+                            <% } %>
+                            <a href="/auth/logout" class="logout-btn">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="auth-buttons">
+                    <a href="/auth/login" class="btn btn-login">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                    <a href="/auth/register" class="btn btn-register">
+                        <i class="fas fa-user-plus"></i> Register
+                    </a>
+                </div>
+            <% } %>
+            <a href="/cart" class="cart-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count">0</span>
+            </a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <%- body %>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <p>&copy; 2024 3TG E-Commerce. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>
