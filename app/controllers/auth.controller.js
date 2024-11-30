@@ -81,16 +81,15 @@ exports.forgotPassword = async (req, res) => {
         const { email } = req.body;
         await authService.forgotPassword(email);
         
-        res.render('auth/forgot-password', {
-            title: 'Forgot Password',
-            error: null,
-            success: 'Password reset link has been sent to your email.',
-            meta: '<meta http-equiv="refresh" content="3;url=/auth/login">',
-            script: ''
+        return res.json({
+            success: true,
+            message: 'Password reset link has been sent to your email.'
         });
     } catch (error) {
-        req.flash('error', error.message || 'An error occurred. Please try again.');
-        return res.redirect('/auth/forgot-password');
+        return res.status(400).json({
+            success: false,
+            message: error.message || 'An error occurred. Please try again.'
+        });
     }
 };
 

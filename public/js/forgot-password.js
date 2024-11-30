@@ -1,33 +1,49 @@
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Document ready');
     const form = document.getElementById('forgotPasswordForm');
-    
-    form.method = 'POST';
-    form.action = '/auth/forgot-password';
-    
-    // Kiểm tra và hiển thị success message
-    const successMessage = document.querySelector('[data-success-message]');
-    if (successMessage) {
-        showMessage(successMessage.dataset.message, 'success');
-    }
+    console.log('Form found:', !!form);
+    const submitButton = form.querySelector('button[type="submit"]');
+    const messageDiv = document.getElementById('message');
 
-    // Kiểm tra và hiển thị error message
-    const errorMessage = document.querySelector('[data-error-message]');
-    if (errorMessage) {
-        showMessage(errorMessage.dataset.message, 'error');
-    }
-    
     form.addEventListener('submit', function(e) {
-        const submitButton = form.querySelector('button[type="submit"]');
+        console.log('Form submitted');
+        e.preventDefault();
         const emailInput = form.querySelector('input[name="email"]');
+        console.log('Email value:', emailInput.value);
         
         if (!emailInput.value) {
-            e.preventDefault();
             showMessage('Please enter your email address', 'error');
             return;
         }
-        
+
         submitButton.disabled = true;
-        submitButton.textContent = 'Sending...';
+        submitButton.innerHTML = '<span class="inline-flex items-center"><svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Sending...</span>';
+
+        fetch('/auth/forgot-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: emailInput.value
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showMessage(data.message, 'success');
+                setTimeout(() => {
+                    window.location.href = '/auth/login';
+                }, 3000);
+            } else {
+                throw new Error(data.message || 'An error occurred');
+            }
+        })
+        .catch(error => {
+            showMessage(error.message || 'An error occurred', 'error');
+            submitButton.disabled = false;
+            submitButton.textContent = 'Send Reset Link';
+        });
     });
 });
 
