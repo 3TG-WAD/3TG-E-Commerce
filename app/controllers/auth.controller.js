@@ -1,57 +1,58 @@
+const User = require("../models/User");
 const authService = require("../services/auth.service");
 
 exports.renderLogin = (req, res) => {
-  res.render("auth/login", {
+  const errorMessage = req.flash("error");
+  const successMessage = req.flash("success");
+  
+  return res.render("auth/login", {
     title: "Login",
-    error: req.flash("error"),
+    error: errorMessage[0],
+    success: successMessage[0]
   });
 };
 
 exports.renderRegister = (req, res) => {
   res.render("auth/register", {
     title: "Register",
-    error: req.flash("error"),
+    error: req.flash("error")
   });
 };
 
 exports.register = async (req, res) => {
   try {
     await authService.registerUser(req.body);
-    res.json({
-      success: true,
-      message:
-        "Registration successful. Please check your email to activate your account.",
-    });
+    req.flash('success', 'Registration successful. Please check your email to activate your account.');
+    return res.redirect('/auth/register');
   } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    req.flash('error', error.message);
+    return res.redirect('/auth/register');
   }
 };
 
 exports.login = async (req, res, next) => {
   try {
     await authService.loginUser(req, res, next);
-    res.redirect("/");
+    return res.redirect('/');
   } catch (error) {
-    req.flash("error", error.message);
-    res.redirect("/auth/login");
+    req.flash('error', error.message);
+    return res.redirect('/auth/login');
   }
 };
 
 exports.activate = async (req, res) => {
   try {
-    await authService.activateAccount(req.params.token);
-    res.render("auth/activation-success", {
-      title: "Account Activated",
-      message:
-        "Your account has been successfully activated! You can now login.",
+    const { token } = req.params;
+    await authService.activateAccount(token);
+    
+    return res.render('auth/activation-success', {
+      title: 'Account Activated',
+      message: 'Your account has been successfully activated! You can now login.'
     });
   } catch (error) {
-    res.render("auth/activation-error", {
-      title: "Activation Error",
-      message: error.message,
+    return res.render('auth/activation-error', {
+      title: 'Activation Error',
+      message: error.message || 'An error occurred during activation. Please try again.'
     });
   }
 };
@@ -73,23 +74,20 @@ exports.renderForgotPassword = (req, res) => {
 
 exports.forgotPassword = async (req, res) => {
     try {
-        await authService.forgotPassword(req.body.email);
-        res.json({
-            success: true,
-            message: 'Password reset email has been sent. Please check your email.'
-        });
+        const { email } = req.body;
+        await authService.forgotPassword(email);
+        req.flash('success', 'Password reset link has been sent to your email.');
+        return res.redirect('/auth/login');
     } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: error.message
-        });
+        req.flash('error', error.message || 'An error occurred. Please try again.');
+        return res.redirect('/auth/forgot-password');
     }
 };
 
 exports.renderResetPassword = (req, res) => {
     res.render('auth/reset-password', {
         title: 'Reset Password',
-        token: req.params.token
+        token: req.params.token 
     });
 };
 
@@ -97,14 +95,10 @@ exports.resetPassword = async (req, res) => {
     try {
         const { token, password } = req.body;
         await authService.resetPassword(token, password);
-        res.json({
-            success: true,
-            message: 'Password has been reset successfully.'
-        });
+        req.flash('success', 'Your password has been updated! You can now login with your new password.');
+        return res.redirect('/auth/login');
     } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: error.message
-        });
+        req.flash('error', error.message || 'An error occurred. Please try again.');
+        return res.redirect('/auth/forgot-password');
     }
 };

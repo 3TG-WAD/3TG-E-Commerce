@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             showMessage('An error occurred. Please try again.', 'error');
+            console.error('Reset password error:', error);
             submitButton.disabled = false;
             submitButton.textContent = 'Reset Password';
         }

@@ -1,84 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Shop.co - Your Fashion Destination">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
     <title><%= title %></title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/auth.css">
+    <link rel="stylesheet" href="/css/stylesheet.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@700&family=Roboto+Slab:wght@700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const styleSheets = document.styleSheets;
+            console.log('Loaded stylesheets:', styleSheets.length);
+            for(let i = 0; i < styleSheets.length; i++) {
+                console.log(`Stylesheet ${i}:`, styleSheets[i].href);
+            }
+        });
+    </script>
 </head>
-<body>
-    <header class="main-header">
-        <div class="logo">
-            <a href="/">
-                <i class="fas fa-store"></i>
-                3TG E-Commerce
-            </a>
+<body class="font-sans antialiased">
+    <%- include('../partials/header') %>
+    
+    <!-- Flash Messages -->
+    <% if (messages.success) { %>
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline"><%= messages.success %></span>
         </div>
-        <nav class="main-nav">
-            <div class="search-bar">
-                <input type="text" placeholder="Search products...">
-                <button><i class="fas fa-search"></i></button>
-            </div>
-            <% if (locals.user) { %>
-                <div class="user-menu">
-                    <span class="user-info">
-                        <img src="<%= user.avatar %>" alt="Avatar" class="avatar">
-                        <%= user.username %>
-                        <i class="fas fa-chevron-down"></i>
-                    </span>
-                    <div class="dropdown-menu">
-                        <div class="user-header">
-                            <img src="<%= user.avatar %>" alt="Avatar">
-                            <div>
-                                <strong><%= user.username %></strong>
-                                <small><%= user.email %></small>
-                            </div>
-                        </div>
-                        <div class="menu-items">
-                            <a href="/profile">
-                                <i class="fas fa-user-circle"></i> Profile
-                            </a>
-                            <a href="/orders">
-                                <i class="fas fa-shopping-bag"></i> Orders
-                            </a>
-                            <% if (user.role === 'admin') { %>
-                                <a href="/admin" class="admin-link">
-                                    <i class="fas fa-cog"></i> Admin Panel
-                                </a>
-                            <% } %>
-                            <a href="/auth/logout" class="logout-btn">
-                                <i class="fas fa-sign-out-alt"></i> Logout
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            <% } else { %>
-                <div class="auth-buttons">
-                    <a href="/auth/login" class="btn btn-login">
-                        <i class="fas fa-sign-in-alt"></i> Login
-                    </a>
-                    <a href="/auth/register" class="btn btn-register">
-                        <i class="fas fa-user-plus"></i> Register
-                    </a>
-                </div>
-            <% } %>
-            <a href="/cart" class="cart-icon">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="cart-count">0</span>
-            </a>
-        </nav>
-    </header>
+    <% } %>
+    
+    <% if (messages.error) { %>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline"><%= messages.error %></span>
+        </div>
+    <% } %>
 
-    <main class="container">
+    <div class="min-h-screen">
         <%- body %>
-    </main>
-
-    <footer class="main-footer">
-        <div class="footer-content">
-            <p>&copy; 2024 3TG E-Commerce. All rights reserved.</p>
-        </div>
-    </footer>
-
+    </div>
+    <%- include('../partials/footer') %>
     <script src="/js/main.js"></script>
+    <script src="/js/register.js"></script>
+    <script src="/js/forgot-password.js"></script>
+    <script src="/js/reset-password.js"></script>
 </body>
-</html>
+</html> 

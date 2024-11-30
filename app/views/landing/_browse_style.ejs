@@ -1,0 +1,38 @@
+<section class="py-12 bg-gray-100">
+  <div class="container mx-auto px-4">
+    <h2
+      class="text-5xl font-black mb-12 text-center"
+      style="font-family: sans-serif"
+    >
+      BROWSE BY DRESS STYLE
+    </h2>
+
+    <div class="grid grid-cols-12 gap-6 max-w-6xl mx-auto">
+      <% const styles = [ {name: 'Casual', image:
+      'https://placehold.co/600x400/white/white', cols: 'col-span-5'}, {name:
+      'Formal', image: 'https://placehold.co/600x400/white/white', cols:
+      'col-span-7'}, {name: 'Party', image:
+      'https://placehold.co/800x400/white/white', cols: 'col-span-7'}, {name:
+      'Gym', image: 'https://placehold.co/400x400/white/white', cols:
+      'col-span-5'} ] %> <% styles.forEach((style) => { %>
+      <div
+        class="relative group cursor-pointer bg-white rounded-3xl overflow-hidden shadow-sm <%= style.cols %>"
+      >
+        <img
+          src="<%= style.image %>"
+          alt="<%= style.name %>"
+          class="w-full h-72 object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+        <div class="absolute top-6 left-6">
+          <h3
+            class="text-black text-3xl font-medium"
+            style="font-family: sans-serif"
+          >
+            <%= style.name %>
+          </h3>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
