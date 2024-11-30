@@ -1,63 +1,53 @@
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('forgotPasswordForm');
     
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
+    form.method = 'POST';
+    form.action = '/auth/forgot-password';
+    
+    // Kiểm tra và hiển thị success message
+    const successMessage = document.querySelector('[data-success-message]');
+    if (successMessage) {
+        showMessage(successMessage.dataset.message, 'success');
+    }
+
+    // Kiểm tra và hiển thị error message
+    const errorMessage = document.querySelector('[data-error-message]');
+    if (errorMessage) {
+        showMessage(errorMessage.dataset.message, 'error');
+    }
+    
+    form.addEventListener('submit', function(e) {
         const submitButton = form.querySelector('button[type="submit"]');
         const emailInput = form.querySelector('input[name="email"]');
         
+        if (!emailInput.value) {
+            e.preventDefault();
+            showMessage('Please enter your email address', 'error');
+            return;
+        }
+        
         submitButton.disabled = true;
         submitButton.textContent = 'Sending...';
-
-        try {
-            console.log('Submitting form with email:', emailInput.value);
-            const response = await fetch('/auth/forgot-password', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: emailInput.value
-                })
-            });
-
-            const contentType = response.headers.get('content-type');
-            if (!contentType || !contentType.includes('application/json')) {
-                throw new Error('Server did not return JSON');
-            }
-
-            const data = await response.json();
-            console.log('Response:', data);
-            
-            if (response.ok) {
-                showMessage(data.message || 'Reset link has been sent to your email.', 'success');
-                form.reset();
-            } else {
-                showMessage(data.message || 'Failed to send reset email', 'error');
-            }
-        } catch (error) {
-            console.error('Forgot password error:', error);
-            showMessage('An error occurred. Please try again later.', 'error');
-        } finally {
-            submitButton.disabled = false;
-            submitButton.textContent = 'Send Reset Link';
-        }
     });
 });
 
 function showMessage(message, type) {
     const messageDiv = document.getElementById('message');
     if (messageDiv) {
-        messageDiv.textContent = message;
-        messageDiv.className = `${type} p-4 rounded-lg mb-4 ${type === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`;
+        messageDiv.innerHTML = `
+            <div class="bg-${type === 'success' ? 'green' : 'red'}-500/10 backdrop-blur-lg text-${type === 'success' ? 'green' : 'red'}-500 p-6 rounded-lg mb-6 flex items-center space-x-4 animate-fade-in border border-${type === 'success' ? 'green' : 'red'}-500/20">
+                <div class="flex-shrink-0">
+                    ${type === 'success' 
+                        ? '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
+                        : '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
+                    }
+                </div>
+                <div class="flex-1">
+                    <p class="font-medium">${message}</p>
+                    ${type === 'success' ? '<p class="text-sm text-green-400/80 mt-1">Redirecting to login page in 3 seconds...</p>' : ''}
+                </div>
+            </div>
+        `;
         messageDiv.style.display = 'block';
-
-        if (type === 'success') {
-            setTimeout(() => {
-                messageDiv.style.display = 'none';
-            }, 5000);
-        }
     }
 }

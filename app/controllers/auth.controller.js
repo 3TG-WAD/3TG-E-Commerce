@@ -68,7 +68,11 @@ exports.logout = (req, res) => {
 
 exports.renderForgotPassword = (req, res) => {
     res.render('auth/forgot-password', {
-        title: 'Forgot Password'
+        title: 'Forgot Password',
+        error: req.flash('error'),
+        success: req.flash('success'),
+        meta: '',
+        script: ''
     });
 };
 
@@ -76,8 +80,14 @@ exports.forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
         await authService.forgotPassword(email);
-        req.flash('success', 'Password reset link has been sent to your email.');
-        return res.redirect('/auth/login');
+        
+        res.render('auth/forgot-password', {
+            title: 'Forgot Password',
+            error: null,
+            success: 'Password reset link has been sent to your email.',
+            meta: '<meta http-equiv="refresh" content="3;url=/auth/login">',
+            script: ''
+        });
     } catch (error) {
         req.flash('error', error.message || 'An error occurred. Please try again.');
         return res.redirect('/auth/forgot-password');
