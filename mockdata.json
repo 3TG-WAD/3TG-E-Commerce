@@ -1,0 +1,556 @@
+[
+    {
+        "product_id": "NK-AM-270-001",
+        "product_name": "Nike Air Max 270",
+        "description": "Lifestyle sneaker with large Air unit for maximum comfort and modern style",
+        "category_id": "LIFESTYLE_SHOES",
+        "manufacturer_id": "NIKE",
+        "creation_time": "2020-07-22T15:40:00Z",
+        "specifications": {
+            "length": "27 cm", 
+            "width": "10.5 cm",
+            "weight": "340 g",
+            "material": "Mesh and Synthetic Leather",
+            "origin": "China",
+            "size_range": "US 6-13"
+        },
+        "photos": [
+            "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/gorfwjchoasrrzr1fggt/AIR+MAX+270.png",
+            "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/ee277c7b-7765-4b8a-bbc6-3393ea7c0631/AIR+MAX+270.png"
+        ]
+    },
+    {
+        "product_id": "AD-ULTRABOOST-002",
+        "product_name": "Adidas Ultraboost",
+        "description": "High-performance running shoes with responsive cushioning.",
+        "category_id": "RUNNING_SHOES",
+        "manufacturer_id": "ADIDAS",
+        "creation_time": "2020-08-15T10:00:00Z",
+        "specifications": {
+            "length": "26 cm", 
+            "width": "10 cm",
+            "weight": "340 g",
+            "material": "Primeknit",
+            "origin": "Vietnam",
+            "size_range": "US 5-12"
+        },
+        "photos": [
+            "https://assets.adidas.com/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/53a3ca19c06b4c5abc39131398fae837_9366/Giay_Ultraboost_5x_DJen_JI1334_HM3_hover.jpg",
+            "https://assets.adidas.com/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/99933e8f66514773996d6e3c347b6e53_9366/Giay_Ultraboost_5x_trang_IH0638_HM3_hover.jpg"
+        ]
+    },
+    {
+        "product_id": "PUMA-RS-X-003",
+        "product_name": "Puma RS-X",
+        "description": "Retro-inspired sneaker with bold colors and cushioning.",
+        "category_id": "LIFESTYLE_SHOES",
+        "manufacturer_id": "PUMA",
+        "creation_time": "2020-09-10T12:30:00Z",
+        "specifications": {
+            "length": "27 cm", 
+            "width": "11 cm",
+            "weight": "350 g",
+            "material": "Mesh and Synthetic",
+            "origin": "China",
+            "size_range": "US 6-13"
+        },
+        "photos": [
+            "https://authentic-shoes.com/wp-content/uploads/2023/04/369818_08.png_c0d906b4dd0c4ab6a4ca8e3c59fa0256.png",
+            "https://authentic-shoes.com/wp-content/uploads/2023/04/557163_01.jpg_5bd6d22699164eb4bb39b7b7ea7cd446-1536x791.png"
+        ]
+    },
+    {
+        "product_id": "NB-990V5-004",
+        "product_name": "New Balance 990v5",
+        "description": "Classic running shoe with premium materials and cushioning.",
+        "category_id": "RUNNING_SHOES",
+        "manufacturer_id": "NEW_BALANCE",
+        "creation_time": "2020-10-05T14:00:00Z",
+        "specifications": {
+            "length": "28 cm", 
+            "width": "10.5 cm",
+            "weight": "400 g",
+            "material": "Suede and Mesh",
+            "origin": "USA",
+            "size_range": "US 7-14"
+        },
+        "photos": [
+            "https://authentic-shoes.com/wp-content/uploads/2023/04/1613109025729_newbalance2_473f9b5a36d44d3a8880d5c227ca1b90.jpeg",
+            "https://authentic-shoes.com/wp-content/uploads/2023/04/6aa63decf325f2dc8ccaa8bae895439f_fd9b6d22db894331959c3d7dc39b3e16.png"
+        ]
+    },
+    {
+        "product_id": "ASICS-GEL-KAYANO-005",
+        "product_name": "ASICS Gel-Kayano",
+        "description": "Stability running shoe with excellent support and cushioning.",
+        "category_id": "RUNNING_SHOES",
+        "manufacturer_id": "ASICS",
+        "creation_time": "2020-11-01T09:00:00Z",
+        "specifications": {
+            "length": "27.5 cm", 
+            "width": "10.5 cm",
+            "weight": "350 g",
+            "material": "Mesh",
+            "origin": "Vietnam",
+            "size_range": "US 6-12"
+        },
+        "photos": [
+            "https://cms-static.asics.com/media-libraries/65528/file.jpg?",
+            "https://cms-static.asics.com/media-libraries/67922/file.pcp.png?"
+        ]
+    },
+    {
+        "product_id": "NIKE-T-SHIRT-006",
+        "product_name": "Nike Dri-FIT T-Shirt",
+        "description": "Lightweight and breathable t-shirt designed for comfort during workouts.",
+        "category_id": "CLOTHING",
+        "manufacturer_id": "NIKE",
+        "creation_time": "2021-01-15T10:00:00Z",
+        "specifications": {
+            "material": "100% Polyester",
+            "size_range": "S-XXL",
+            "color": "Black",
+            "fit": "Regular"
+        },
+        "photos": [
+            "https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/41eadf7c-3ea7-4da7-b45c-961877eef5ef/AS+M+NP+DF+TIGHT+TOP+SS.png",
+            "https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/a0aff5d7-598d-460f-ad32-ad8008b8dfda/AS+M+NK+DF+RISE+365+SS.png"
+        ]
+    },
+    {
+        "product_id": "ADIDAS-SHORTS-007",
+        "product_name": "Adidas Performance Shorts",
+        "description": "Comfortable shorts for training and casual wear.",
+        "category_id": "CLOTHING",
+        "manufacturer_id": "ADIDAS",
+        "creation_time": "2021-02-20T11:00:00Z",
+        "specifications": {
+            "material": "100% Recycled Polyester",
+            "size_range": "M-XXL",
+            "color": "Navy Blue",
+            "fit": "Regular"
+        },
+        "photos": [
+            "https://assets.adidas.com/images/w_766,h_766,f_auto,q_auto,fl_lossy,c_fill,g_auto/2a24b1757281413f879146126ea55968_9366/gym-training-2-in-1-shorts.jpg",
+            "https://assets.adidas.com/images/w_766,h_766,f_auto,q_auto,fl_lossy,c_fill,g_auto/892e3320464243488e6d3ce6e88e4b36_9366/gym-training-2-in-1-shorts.jpg"
+        ]
+    },
+    {
+        "product_id": "PUMA-JACKET-008",
+        "product_name": "Puma Essentials Jacket",
+        "description": "Stylish jacket for casual outings and workouts.",
+        "category_id": "CLOTHING",
+        "manufacturer_id": "PUMA",
+        "creation_time": "2021-03-10T12:00:00Z",
+        "specifications": {
+            "material": "Cotton Blend",
+            "size_range": "S-XL",
+            "color": "Grey",
+            "fit": "Regular"
+        },
+        "photos": [
+            "https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_1200,h_1200/global/848938/27/mod05/fnd/EEA/fmt/png/Essentials-Padded-Jacket-Men",
+            "https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_1200,h_1200/global/848938/27/fnd/EEA/fmt/png/Essentials-Padded-Jacket-Men"
+        ]
+    },
+    {
+        "product_id": "NB-HOODIE-009",
+        "product_name": "New Balance Classic Hoodie",
+        "description": "Cozy hoodie perfect for layering and casual wear.",
+        "category_id": "CLOTHING",
+        "manufacturer_id": "NEW_BALANCE",
+        "creation_time": "2021-04-05T14:30:00Z",
+        "specifications": {
+            "material": "Cotton and Polyester",
+            "size_range": "M-XXL",
+            "color": "Red",
+            "fit": "Loose"
+        },
+        "photos": [
+            "https://nb.scene7.com/is/image/NB/mt41534sot_nb_70_i?$pdpflexf22x$&qlt=80&fmt=webp&wid=880&hei=880",
+            "https://nb.scene7.com/is/image/NB/mt41511bk_nb_70_i?$pdpflexf22x$&qlt=80&fmt=webp&wid=880&hei=880"
+        ]
+    },
+    {
+        "product_id": "ASICS-TIGHTS-010",
+        "product_name": "ASICS Running Tights",
+        "description": "High-performance tights for running and training.",
+        "category_id": "CLOTHING",
+        "manufacturer_id": "ASICS",
+        "creation_time": "2021-05-15T09:00:00Z",
+        "specifications": {
+            "material": "Polyester and Spandex",
+            "size_range": "S-L",
+            "color": "Black",
+            "fit": "Tight"
+        },
+        "photos": [
+            "https://images.asics.com/is/image/asics/2011D089_001_GM_FT_GLB?$sfcc-product$",
+            "https://images.asics.com/is/image/asics/2011D098_001_GM_FT_GLB?$sfcc-product$"
+        ]
+    },
+		{
+        "product_id": "NIKE-FLEECE-011",
+        "product_name": "Nike Fleece Joggers",
+        "description": "Soft fleece joggers for comfort and warmth during workouts.",
+        "category_id": "CLOTHING",
+        "manufacturer_id": "NIKE",
+        "creation_time": "2021-06-20T10:00:00Z",
+        "specifications": {
+            "material": "Fleece",
+            "size_range": "S-XXL",
+            "color": "Charcoal",
+            "fit": "Regular"
+        },
+        "photos": [
+            "https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/0a6da6e6-5e76-442e-a4f5-60ca5f741a51/AS+M+NK+SOLO+SWSH+FLC+CF+PANT.png",
+            "https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/d7254b09-7ef9-4211-bcd1-b7c411a03e99/AS+M+NK+CLUB+FT+OVERSIZED+PANT.png"
+        ]
+    },
+    {
+        "product_id": "ADIDAS-TANK-012",
+        "product_name": "Adidas Training Tank Top",
+        "description": "Lightweight tank top for optimal breathability during workouts.",
+        "category_id": "CLOTHING",
+        "manufacturer_id": "ADIDAS",
+        "creation_time": "2021-07-15T11:30:00Z",
+        "specifications": {
+            "material": "100% Polyester",
+            "size_range": "S-XL",
+            "color": "White",
+            "fit": "Regular"
+        },
+        "photos": [
+            "https://assets.adidas.com/images/w_766,h_766,f_auto,q_auto,fl_lossy,c_fill,g_auto/3989ee0b75d64b39b5d2e5fb4ebb1d02_9366/tennis-pro-heat.rdy-tank-top.jpg",
+            "https://assets.adidas.com/images/w_766,h_766,f_auto,q_auto,fl_lossy,c_fill,g_auto/f4d4063cc46f4f1fa72c99a8107c3c64_9366/own-the-run-runners-tank-top.jpg"
+        ]
+    },
+    {
+        "product_id": "PUMA-SHOES-013",
+        "product_name": "Puma Future Rider",
+        "description": "Retro running shoes with a modern twist and comfortable fit.",
+        "category_id": "LIFESTYLE_SHOES",
+        "manufacturer_id": "PUMA",
+        "creation_time": "2021-08-10T12:00:00Z",
+        "specifications": {
+            "length": "26.5 cm", 
+            "width": "10.5 cm",
+            "weight": "320 g",
+            "material": "Nylon and Suede",
+            "origin": "China",
+            "size_range": "US 6-12"
+        },
+        "photos": [
+            "https://sneakerdaily.vn/wp-content/uploads/2024/11/Giay-PUMA-Easy-Rider-Vintage-Tangerine-White-399028-02.jpg",
+            "https://sneakerdaily.vn/wp-content/uploads/2024/11/Giay-PUMA-Easy-Rider-Vintage-Red-White-399028-01.jpg"
+        ]
+    },
+    {
+        "product_id": "NB-TANK-014",
+        "product_name": "New Balance Performance Tank",
+        "description": "Breathable tank top designed for high-intensity workouts.",
+        "category_id": "CLOTHING",
+        "manufacturer_id": "NEW_BALANCE",
+        "creation_time": "2021-09-05T10:00:00Z",
+        "specifications": {
+            "material": "Polyester",
+            "size_range": "S-XXL",
+            "color": "Blue",
+            "fit": "Regular"
+        },
+        "photos": [
+            "https://nb.scene7.com/is/image/NB/wt43931qnef_nb_73_i?$pdpflexf22x$&qlt=80&fmt=webp&wid=880&hei=880",
+            "https://nb.scene7.com/is/image/NB/wt41250dho_nb_70_i?$pdpflexf22x$&qlt=80&fmt=webp&wid=880&hei=880"
+        ]
+    },
+    {
+        "product_id": "ASICS-SHOES-015",
+        "product_name": "ASICS Gel-Nimbus",
+        "description": "Cushioned running shoes designed for long-distance comfort.",
+        "category_id": "RUNNING_SHOES",
+        "manufacturer_id": "ASICS",
+        "creation_time": "2021-10-20T14:00:00Z",
+        "specifications": {
+            "length": "28 cm", 
+            "width": "11 cm",
+            "weight": "310 g",
+            "material": "Mesh and Synthetic",
+            "origin": "Vietnam",
+            "size_range": "US 7-14"
+        },
+        "photos": [
+            "https://images.asics.com/is/image/asics/1011B794_403_SR_LT_GLB?$productlist$",
+            "https://images.asics.com/is/image/asics/1012B602_300_SR_LT_GLB?$productlist$"
+        ]
+    },
+    {
+        "product_id": "NIKE-LEGGINGS-016",
+        "product_name": "Nike Pro Leggings",
+        "description": "High-performance leggings for training and workouts.",
+        "category_id": "CLOTHING",
+        "manufacturer_id": "NIKE",
+        "creation_time": "2021-11-15T09:00:00Z",
+        "specifications": {
+            "material": "Polyester and Spandex",
+            "size_range": "S-XL",
+            "color": "Black",
+            "fit": "Tight"
+        },
+        "photos": [
+            "https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/7d9aff3e-3f4d-4d6c-9a8f-332db91a97b8/AS+W+NP+SCULPT+DF+HR+TIGHT.png",
+            "https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/280d8f09-b319-446c-a1ea-227378f934ff/AS+W+NP+DF+MR+7%2F8+TIGHT+TT.png"
+        ]
+    },
+    {
+        "product_id": "ADIDAS-JACKET-017",
+        "product_name": "Adidas Windbreaker",
+        "description": "Lightweight windbreaker for protection against the elements.",
+        "category_id": "CLOTHING",
+        "manufacturer_id": "ADIDAS",
+        "creation_time": "2021-12-10T10:00:00Z",
+        "specifications": {
+            "material": "100% Nylon",
+            "size_range": "M-XXL",
+            "color": "Green",
+            "fit": "Regular"
+        },
+        "photos": [
+            "https://assets.adidas.com/images/w_766,h_766,f_auto,q_auto,fl_lossy,c_fill,g_auto/3dc964d24ee14547b79107c379080a68_9366/wind.rdy-hyperglam-windbreaker.jpg",
+            "https://assets.adidas.com/images/w_766,h_766,f_auto,q_auto,fl_lossy,c_fill,g_auto/d80e589dab8748b3a8dfb9acf42917c0_9366/city-escape-woven-windbreaker.jpg"
+        ]
+    },
+    {
+        "product_id": "PUMA-T-SHIRT-018",
+        "product_name": "Puma Graphic T-Shirt",
+        "description": "Casual t-shirt with a stylish graphic design.",
+        "category_id": "CLOTHING",
+        "manufacturer_id": "PUMA",
+        "creation_time": "2022-01-05T11:00:00Z",
+        "specifications": {
+            "material": "Cotton",
+            "size_range": "S-XXL",
+            "color": "White",
+            "fit": "Regular"
+        },
+        "photos": [
+            "https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_1200,h_1200/global/630374/01/mod01/fnd/PNA/fmt/png/PUMA-x-SCOOBY-DOO-Men's-Tee",
+            "https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_1200,h_1200/global/630374/01/mod04/fnd/PNA/fmt/png/PUMA-x-SCOOBY-DOO-Men's-Tee"
+        ]
+    },
+    {
+        "product_id": "NB-SHORTS-019",
+        "product_name": "New Balance Running Shorts",
+        "description": "Lightweight shorts designed for running and training.",
+        "category_id": "CLOTHING",
+        "manufacturer_id": "NEW_BALANCE",
+        "creation_time": "2022-02-15T10:30:00Z",
+        "specifications": {
+            "material": "100% Polyester",
+            "size_range": "M-XXL",
+            "color": "Black",
+            "fit": "Regular"
+        },
+        "photos": [
+            "https://nb.scene7.com/is/image/NB/ms41232gt_nb_71_i?$pdpflexf22x$&qlt=80&fmt=webp&wid=880&hei=880",
+            "https://nb.scene7.com/is/image/NB/ms41401tei_nb_70_i?$pdpflexf22x$&qlt=80&fmt=webp&wid=880&hei=880"
+        ]
+    },
+    {
+        "product_id": "ASICS-SWEATSHIRT-020",
+        "product_name": "ASICS Sweatshirt",
+        "description": "Comfortable sweatshirt for casual wear and workouts.",
+        "category_id": "CLOTHING",
+        "manufacturer_id": "ASICS",
+        "creation_time": "2022-03-20T14:00:00Z",
+        "specifications": {
+            "material": "Cotton Blend",
+            "size_range": "S-XL",
+            "color": "Navy",
+            "fit": "Loose"
+        },
+        "photos": [
+            "https://images.asics.com/is/image/asics/2011D088_200_GM_FT_GLB?$sfcc-product$",
+            "https://images.asics.com/is/image/asics/2203A297_020_GM_FT_GLB?$zoom$"
+        ]
+    },
+    {
+        "product_id": "NIKE-BACKPACK-021",
+        "product_name": "Nike Sports Backpack",
+        "description": "Durable backpack for carrying sports gear and essentials.",
+        "category_id": "ACCESSORIES",
+        "manufacturer_id": "NIKE",
+        "creation_time": "2022-04-15T10:00:00Z",
+        "specifications": {
+            "material": "Polyester",
+            "dimensions": "45x30x15 cm",
+            "color": "Black",
+            "capacity": "25L"
+        },
+        "photos": [
+            "https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/b93efdd8-0374-46b7-991f-a48d9db5be0c/NK+HERITAGE+BKPK.png",
+            "https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/ebf604c2-343c-4285-b083-66138d9b7505/Y+NK+ELMTL+BPK-MTL+NK+AIR+FA24.png"
+        ]
+    },
+    {
+        "product_id": "ADIDAS-CAP-022",
+        "product_name": "Adidas Classic Cap",
+        "description": "Stylish cap for sun protection and casual wear.",
+        "category_id": "ACCESSORIES",
+        "manufacturer_id": "ADIDAS",
+        "creation_time": "2022-05-10T11:00:00Z",
+        "specifications": {
+            "material": "100% Cotton",
+            "size_range": "One Size",
+            "color": "Black",
+            "fit": "Adjustable"
+        },
+        "photos": [
+            "https://assets.adidas.com/images/w_766,h_766,f_auto,q_auto,fl_lossy,c_fill,g_auto/2175d50733ab437a92f7e4fcb5718c95_9366/metal-badge-lightweight-baseball-cap.jpg",
+            "https://assets.adidas.com/images/w_766,h_766,f_auto,q_auto,fl_lossy,c_fill,g_auto/ed4a20374b344f25b40163e060e53095_9366/daily-cap.jpg"
+        ]
+    },
+    {
+        "product_id": "PUMA-SOCKS-023",
+        "product_name": "Puma Performance Socks",
+        "description": "Comfortable socks designed for sports and everyday wear.",
+        "category_id": "ACCESSORIES",
+        "manufacturer_id": "PUMA",
+        "creation_time": "2022-06-15T10:30:00Z",
+        "specifications": {
+            "material": "Cotton Blend",
+            "size_range": "S-XL",
+            "color": "White",
+            "fit": "Regular"
+        },
+        "photos": [
+            "https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_600,h_600/global/859187/02/fnd/PNA/fmt/png/Men's-Half-Terry-Crew-Length-Socks-[3-Pairs]",
+            "https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_600,h_600/global/859180/03/fnd/PNA/fmt/png/Men's-Half-Terry-No-Show-Socks-[3-Pairs]"
+        ]
+    },
+    {
+        "product_id": "NB-WATERBOTTLE-024",
+        "product_name": "New Balance Water Bottle",
+        "description": "Durable water bottle for hydration during workouts.",
+        "category_id": "ACCESSORIES",
+        "manufacturer_id": "NEW_BALANCE",
+        "creation_time": "2022-07-20T14:00:00Z",
+        "specifications": {
+            "material": "BPA-Free Plastic",
+            "capacity": "750ml",
+            "color": "Blue",
+            "features": "Leak-proof"
+        },
+        "photos": [
+            "https://nb.scene7.com/is/image/NB/lab23117bk_nb_03_i?$pdpflexf22x$&qlt=80&fmt=webp&wid=880&hei=880",
+            "https://nb.scene7.com/is/image/NB/lab23117bk_nb_04_i?$pdpflexf22x$&qlt=80&fmt=webp&wid=880&hei=880"
+        ]
+    },
+    {
+        "product_id": "ASICS-BAG-025",
+        "product_name": "ASICS Gym Bag",
+        "description": "Spacious gym bag for carrying workout essentials.",
+        "category_id": "ACCESSORIES",
+        "manufacturer_id": "ASICS",
+        "creation_time": "2022-08-15T10:00:00Z",
+        "specifications": {
+            "material": "Polyester",
+            "dimensions": "50x25x25 cm",
+            "color": "Black",
+            "capacity": "30L"
+        },
+        "photos": [
+            "https://images.asics.com/is/image/asics/3193A010_001_AC_FT_GLB?$zoom$",
+            "https://images.asics.com/is/image/asics/3193A010_001_AC_BK_GLB?$zoom$"
+        ]
+    },
+    {
+        "product_id": "NIKE-HAT-026",
+        "product_name": "Nike Sports Hat",
+        "description": "Lightweight hat for sun protection during outdoor activities.",
+        "category_id": "ACCESSORIES",
+        "manufacturer_id": "NIKE",
+        "creation_time": "2022-09-10T11:00:00Z",
+        "specifications": {
+            "material": "100% Polyester",
+            "size_range": "One Size",
+            "color": "Grey",
+            "fit": "Adjustable"
+        },
+        "photos": [
+            "https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/5b9d7e61-9546-4ad3-afeb-40165afeea04/J+RISE+CAP+S+CB+MTL+JM.png",
+            "https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/53ef3236-e640-4b50-a8c2-e2d989f02b21/U+NK+DF+CLUB+CAP+S+CB+MTFUT+L.png"
+        ]
+    },
+    {
+        "product_id": "ADIDAS-BELT-027",
+        "product_name": "Adidas Training Belt",
+        "description": "Adjustable belt for a secure fit during workouts.",
+        "category_id": "ACCESSORIES",
+        "manufacturer_id": "ADIDAS",
+        "creation_time": "2022-10-05T10:30:00Z",
+        "specifications": {
+            "material": "Nylon",
+            "size_range": "S-XL",
+            "color": "Black",
+            "fit": "Adjustable"
+        },
+        "photos": [
+            "https://assets.adidas.com/images/w_766,h_766,f_auto,q_auto,fl_lossy,c_fill,g_auto/6aa05b2ef0be4ff2af817cf967008d34_9366/reversible-webbing-belt.jpg",
+            "https://assets.adidas.com/images/w_766,h_766,f_auto,q_auto,fl_lossy,c_fill,g_auto/18486a25cbc540a5bd47cb1a627daae8_9366/reversible-webbing-belt.jpg"
+        ]
+    },
+    {
+        "product_id": "PUMA-WATCH-028",
+        "product_name": "Puma Sports Watch",
+        "description": "Durable sports watch with fitness tracking features.",
+        "category_id": "ACCESSORIES",
+        "manufacturer_id": "PUMA",
+        "creation_time": "2022-11-15T14:00:00Z",
+        "specifications": {
+            "material": "Silicone",
+            "water_resistance": "50m",
+            "color": "Black",
+            "features": "Heart Rate Monitor, GPS"
+        },
+        "photos": [
+            "data:image/jpeg;base64,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",
+            "data:image/jpeg;base64,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"
+        ]
+    },
+    {
+        "product_id": "NB-SHOULDERBAG-029",
+        "product_name": "New Balance Shoulder Bag",
+        "description": "Compact shoulder bag for daily essentials.",
+        "category_id": "ACCESSORIES",
+        "manufacturer_id": "NEW_BALANCE",
+        "creation_time": "2022-12-20T10:00:00Z",
+        "specifications": {
+            "material": "Polyester",
+            "dimensions": "30x20x10 cm",
+            "color": "Grey",
+            "capacity": "10L"
+        },
+        "photos": [
+            "https://nb.scene7.com/is/image/NB/lab23178gin_nb_04_i?$pdpflexf22x$&qlt=80&fmt=webp&wid=880&hei=880",
+            "https://nb.scene7.com/is/image/NB/lab23109cas_nb_04_i?$pdpflexf22x$&qlt=80&fmt=webp&wid=880&hei=880"
+        ]
+    },
+    {
+        "product_id": "ASICS-HEADBAND-030",
+        "product_name": "ASICS Sports Headband",
+        "description": "Moisture-wicking headband for workouts.",
+        "category_id": "ACCESSORIES",
+        "manufacturer_id": "ASICS",
+        "creation_time": "2023-01-15T11:00:00Z",
+        "specifications": {
+            "material": "Polyester",
+            "size_range": "One Size",
+            "color": "Black",
+            "fit": "Stretchable"
+        },
+        "photos": [
+            "https://images.asics.com/is/image/asics/3013A874_001_AC_FT_GLB?$zoom$",
+            "https://images.asics.com/is/image/asics/3013A874_001_AC_BK_GLB?$sfcc-product$"
+        ]
+    }    
+]
