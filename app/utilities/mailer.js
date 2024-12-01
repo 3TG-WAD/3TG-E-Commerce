@@ -29,33 +29,51 @@ class Mailer {
   }
 
   getEmailTemplate(template, context) {
-    // Basic template handling - you can expand this with more sophisticated templating
+    const baseStyle = `
+      font-family: Arial, sans-serif;
+      color: #333333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    `;
+    
+    const buttonStyle = `
+      background-color: #007bff;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      padding: 12px 25px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 20px 0;
+      cursor: pointer;
+    `;
+
     switch (template) {
       case 'activation-email':
         return `
-          <h1>Account Activation</h1>
-          <p>Please click the link below to activate your account:</p>
-          <a href="${context.activationUrl}">Activate Account</a>
+          <div style="${baseStyle}">
+            <h1 style="color: #007bff; margin-bottom: 20px;">Welcome to Our Platform!</h1>
+            <p style="font-size: 16px; line-height: 1.5;">Thank you for registering. To get started, please activate your account.</p>
+            <p style="font-size: 16px; line-height: 1.5;">Click the button below to verify your email address:</p>
+            <a href="${context.activationUrl}" style="${buttonStyle}">Activate Account</a>
+            <p style="font-size: 14px; color: #666; margin-top: 30px;">If you didn't create an account, you can safely ignore this email.</p>
+          </div>
         `;
       case 'reset-password-email':
         return `
-          <h1>Password Reset Request</h1>
-          <p>You are receiving this email because you (or someone else) has requested to reset your password.</p>
-          <p>Please click the button below to reset your password:</p>
-          <a href="${context.resetUrl}" style="
-            background-color: #4CAF50;
-            border: none;
-            color: white;
-            padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-          ">Reset Password</a>
-          <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
-          <p>This link will expire in 1 hour.</p>
+          <div style="${baseStyle}">
+            <h1 style="color: #007bff; margin-bottom: 20px;">Password Reset Request</h1>
+            <p style="font-size: 16px; line-height: 1.5;">We received a request to reset your password.</p>
+            <p style="font-size: 16px; line-height: 1.5;">Click the button below to create a new password:</p>
+            <a href="${context.resetUrl}" style="${buttonStyle}">Reset Password</a>
+            <p style="font-size: 14px; color: #666; margin-top: 20px;">This link will expire in 1 hour.</p>
+            <p style="font-size: 14px; color: #666;">If you didn't request this change, you can safely ignore this email.</p>
+            <hr style="border: 1px solid #eee; margin: 30px 0;">
+            <p style="font-size: 12px; color: #999;">For security reasons, we recommend changing your password regularly.</p>
+          </div>
         `;
       default:
         return '';

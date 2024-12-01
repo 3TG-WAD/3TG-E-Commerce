@@ -81,7 +81,7 @@ function validateForm() {
     if (password.length < 8) {
         showError('Password must be at least 8 characters long');
         return false;
-    }
+    }   
 
     if (password !== confirmPassword) {
         showError('Passwords do not match');

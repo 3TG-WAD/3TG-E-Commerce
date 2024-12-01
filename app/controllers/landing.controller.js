@@ -8,6 +8,8 @@ exports.index = (req, res) => {
     });
   } catch (error) {
     console.error('Landing page error:', error);
-    res.status(500).render('error/500');
+    res.status(500).render('error/500', {
+      title: '500 - Server Error'
+    });
   }
 };

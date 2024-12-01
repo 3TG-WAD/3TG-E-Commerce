@@ -60,20 +60,30 @@ exports.activate = async (req, res) => {
 exports.logout = (req, res) => {
   req.logout((err) => {
     if (err) {
-      req.flash("error", "Failed to logout");
+      console.error('Logout error:', err);
+      return res.status(500).render('error/500', {
+        title: '500 - Server Error'
+      });
     }
     res.redirect("/auth/login");
   });
 };
 
 exports.renderForgotPassword = (req, res) => {
-    res.render('auth/forgot-password', {
-        title: 'Forgot Password',
-        error: req.flash('error'),
-        success: req.flash('success'),
-        meta: '',
-        script: ''
-    });
+    try {
+        res.render('auth/forgot-password', {
+            title: 'Forgot Password',
+            error: req.flash('error'),
+            success: req.flash('success'),
+            meta: '',
+            script: ''
+        });
+    } catch (error) {
+        console.error('Render forgot password error:', error);
+        res.status(500).render('error/500', {
+            title: '500 - Server Error'
+        });
+    }
 };
 
 exports.forgotPassword = async (req, res) => {
@@ -86,28 +96,36 @@ exports.forgotPassword = async (req, res) => {
             message: 'Password reset link has been sent to your email.'
         });
     } catch (error) {
-        return res.status(400).json({
+        console.error('Forgot password error:', error);
+        return res.status(500).json({
             success: false,
-            message: error.message || 'An error occurred. Please try again.'
+            message: 'An internal server error occurred'
         });
     }
 };
 
 exports.renderResetPassword = (req, res) => {
-    res.render('auth/reset-password', {
-        title: 'Reset Password',
-        token: req.params.token 
-    });
+  res.render('auth/reset-password', {
+      title: 'Reset Password',
+      token: req.params.token,
+      meta: '',
+      script: ''
+  });
 };
 
 exports.resetPassword = async (req, res) => {
     try {
         const { token, password } = req.body;
         await authService.resetPassword(token, password);
-        req.flash('success', 'Your password has been updated! You can now login with your new password.');
-        return res.redirect('/auth/login');
+        
+        return res.json({
+            success: true,
+            message: 'Your password has been updated successfully!'
+        });
     } catch (error) {
-        req.flash('error', error.message || 'An error occurred. Please try again.');
-        return res.redirect('/auth/forgot-password');
+        return res.status(400).json({
+            success: false,
+            message: error.message || 'An error occurred. Please try again.'
+        });
     }
 };

@@ -69,6 +69,21 @@ const configureExpress = (app) => {
       message: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   });
+
+  // 404 handler
+  app.use((req, res) => {
+    res.status(404).render('error/404', {
+      title: '404 - Page Not Found'
+    });
+  });
+
+  // 500 handler
+  app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).render('error/500', {
+      title: '500 - Server Error'
+    });
+  });
 };
 
 module.exports = configureExpress;
