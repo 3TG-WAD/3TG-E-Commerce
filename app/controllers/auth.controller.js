@@ -1,57 +1,58 @@
+const User = require("../models/User");
 const authService = require("../services/auth.service");
 
 exports.renderLogin = (req, res) => {
-  res.render("auth/login", {
+  const errorMessage = req.flash("error");
+  const successMessage = req.flash("success");
+  
+  return res.render("auth/login", {
     title: "Login",
-    error: req.flash("error"),
+    error: errorMessage[0],
+    success: successMessage[0]
   });
 };
 
 exports.renderRegister = (req, res) => {
   res.render("auth/register", {
     title: "Register",
-    error: req.flash("error"),
+    error: req.flash("error")
   });
 };
 
 exports.register = async (req, res) => {
   try {
     await authService.registerUser(req.body);
-    res.json({
-      success: true,
-      message:
-        "Registration successful. Please check your email to activate your account.",
-    });
+    req.flash('success', 'Registration successful. Please check your email to activate your account.');
+    return res.redirect('/auth/register');
   } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    req.flash('error', error.message);
+    return res.redirect('/auth/register');
   }
 };
 
 exports.login = async (req, res, next) => {
   try {
     await authService.loginUser(req, res, next);
-    res.redirect("/");
+    return res.redirect('/');
   } catch (error) {
-    req.flash("error", error.message);
-    res.redirect("/auth/login");
+    req.flash('error', error.message);
+    return res.redirect('/auth/login');
   }
 };
 
 exports.activate = async (req, res) => {
   try {
-    await authService.activateAccount(req.params.token);
-    res.render("auth/activation-success", {
-      title: "Account Activated",
-      message:
-        "Your account has been successfully activated! You can now login.",
+    const { token } = req.params;
+    await authService.activateAccount(token);
+    
+    return res.render('auth/activation-success', {
+      title: 'Account Activated',
+      message: 'Your account has been successfully activated! You can now login.'
     });
   } catch (error) {
-    res.render("auth/activation-error", {
-      title: "Activation Error",
-      message: error.message,
+    return res.render('auth/activation-error', {
+      title: 'Activation Error',
+      message: error.message || 'An error occurred during activation. Please try again.'
     });
   }
 };
@@ -59,52 +60,72 @@ exports.activate = async (req, res) => {
 exports.logout = (req, res) => {
   req.logout((err) => {
     if (err) {
-      req.flash("error", "Failed to logout");
+      console.error('Logout error:', err);
+      return res.status(500).render('error/500', {
+        title: '500 - Server Error'
+      });
     }
     res.redirect("/auth/login");
   });
 };
 
 exports.renderForgotPassword = (req, res) => {
-    res.render('auth/forgot-password', {
-        title: 'Forgot Password'
-    });
+    try {
+        res.render('auth/forgot-password', {
+            title: 'Forgot Password',
+            error: req.flash('error'),
+            success: req.flash('success'),
+            meta: '',
+            script: ''
+        });
+    } catch (error) {
+        console.error('Render forgot password error:', error);
+        res.status(500).render('error/500', {
+            title: '500 - Server Error'
+        });
+    }
 };
 
 exports.forgotPassword = async (req, res) => {
     try {
-        await authService.forgotPassword(req.body.email);
-        res.json({
+        const { email } = req.body;
+        await authService.forgotPassword(email);
+        
+        return res.json({
             success: true,
-            message: 'Password reset email has been sent. Please check your email.'
+            message: 'Password reset link has been sent to your email.'
         });
     } catch (error) {
-        res.status(400).json({
+        console.error('Forgot password error:', error);
+        return res.status(500).json({
             success: false,
-            message: error.message
+            message: 'An internal server error occurred'
         });
     }
 };
 
 exports.renderResetPassword = (req, res) => {
-    res.render('auth/reset-password', {
-        title: 'Reset Password',
-        token: req.params.token
-    });
+  res.render('auth/reset-password', {
+      title: 'Reset Password',
+      token: req.params.token,
+      meta: '',
+      script: ''
+  });
 };
 
 exports.resetPassword = async (req, res) => {
     try {
         const { token, password } = req.body;
         await authService.resetPassword(token, password);
-        res.json({
+        
+        return res.json({
             success: true,
-            message: 'Password has been reset successfully.'
+            message: 'Your password has been updated successfully!'
         });
     } catch (error) {
-        res.status(400).json({
+        return res.status(400).json({
             success: false,
-            message: error.message
+            message: error.message || 'An error occurred. Please try again.'
         });
     }
 };

@@ -1,16 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Account Activation Success</title>
-    <link rel="stylesheet" href="/css/auth.css">
+    <title>Account Activation Success - 3TG Store</title>
+    <link rel="stylesheet" href="/css/stylesheet.css">
 </head>
-<body>
-    <div class="auth-container">
-        <div class="success-icon">✓</div>
-        <h2>Account Activated!</h2>
-        <p><%= message %></p>
-        <div class="auth-links">
-            <a href="/auth/login" class="btn">Login Now</a>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-lg text-center">
+            <div class="success-icon mx-auto bg-green-100 rounded-full p-3 w-16 h-16 flex items-center justify-center">
+                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            
+            <div>
+                <h2 class="text-3xl font-extrabold text-gray-900">Account Activated!</h2>
+                <p class="mt-2 text-gray-600"><%= message %></p>
+            </div>
+
+            <div>
+                <a href="/auth/login" 
+                   class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Login Now
+                </a>
+            </div>
         </div>
     </div>
 </body>
