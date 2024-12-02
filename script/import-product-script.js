@@ -13,7 +13,7 @@ async function importProducts() {
         console.log('Connected to MongoDB');
 
         // Đọc file JSON
-        const jsonPath = path.join(__dirname, '../mockdata.json');
+        const jsonPath = path.join(__dirname, '../productdata.json');
         const productsData = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
 
         // Xóa tất cả sản phẩm cũ (tùy chọn)
