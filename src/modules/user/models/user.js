@@ -53,6 +53,16 @@ const userSchema = new mongoose.Schema({
     default: 'local'
   },
   googleId: String,
+  phone: {
+    type: String,
+    trim: true,
+    validate: {
+      validator: function(v) {
+        return /^[0-9]{10}$/.test(v);
+      },
+      message: props => `${props.value} không phải là số điện thoại hợp lệ!`
+    }
+  },
 });
 
 // Hash password before saving
