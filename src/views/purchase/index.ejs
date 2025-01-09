@@ -1,0 +1,109 @@
+<div class="min-h-screen bg-gray-100 py-6">
+    <div class="container mx-auto px-4">
+        <!-- Tabs -->
+        <div class="bg-white rounded-lg shadow mb-4">
+            <div id="orderTabs" class="flex space-x-1 bg-gray-100 p-1 rounded-xl mb-6">
+                <button data-tab="all" 
+                        class="tab-button flex-1 py-3 px-6 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none
+                               active-tab">
+                    All
+                </button>
+                <button data-tab="pending" 
+                        class="tab-button flex-1 py-3 px-6 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none">
+                    Pending
+                </button>
+                <button data-tab="processing" 
+                        class="tab-button flex-1 py-3 px-6 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none">
+                    Processing
+                </button>
+                <button data-tab="shipping" 
+                        class="tab-button flex-1 py-3 px-6 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none">
+                    Shipping
+                </button>
+                <button data-tab="completed" 
+                        class="tab-button flex-1 py-3 px-6 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none">
+                    Completed
+                </button>
+                <button data-tab="cancelled" 
+                        class="tab-button flex-1 py-3 px-6 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none">
+                    Cancelled
+                </button>
+            </div>
+        </div>
+
+
+        <!-- Search Bar -->
+        <div class="relative max-w-2xl mx-auto mb-6">
+            <input type="text" 
+                   class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 
+                          focus:outline-none focus:border-blue-500 focus:ring-1 
+                          focus:ring-blue-500 transition-colors"
+                   placeholder="Search by Order ID, Shop name or Product name">
+        </div>
+
+        <!-- Content Area -->
+        <div id="purchaseContent" class="purchase-content">
+            <!-- Empty State -->
+            <div class="empty-state bg-white rounded-lg shadow p-8 text-center">
+                <img src="/images/orders/empty-order.png" alt="No Orders" class="w-11 h-11 mx-auto mb-4">
+                <p class="text-gray-500">Empty</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Template for Order Items (Hidden) -->
+<template id="orderItemTemplate">
+    <div class="bg-white rounded-lg shadow mb-4 overflow-hidden">
+        <!-- Shop Info -->
+        <div class="p-4 border-b flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <img src="" alt="" class="w-5 h-5 rounded-full shop-avatar">
+                <span class="font-medium shop-name"></span>
+                <button class="text-orange-500 hover:text-orange-600">
+                    <i class="fas fa-store mr-1"></i>Xem shop
+                </button>
+            </div>
+            <span class="order-status"></span>
+        </div>
+
+        <!-- Products -->
+        <div class="products-container">
+            <!-- Products will be inserted here -->
+        </div>
+
+        <!-- Order Summary -->
+        <div class="p-4 bg-gray-50">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center text-gray-600">
+                    <i class="fas fa-shield-alt mr-2"></i>
+                    <span>Thành tiền:</span>
+                </div>
+                <span class="text-xl text-orange-500 font-medium total-amount"></span>
+            </div>
+            <div class="flex justify-end space-x-3 mt-4 order-actions">
+                <!-- Action buttons will be inserted here -->
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Template for Product Items (Hidden) -->
+<template id="productItemTemplate">
+    <div class="p-4 border-b flex items-center space-x-4">
+        <img src="" alt="" class="w-20 h-20 object-cover rounded product-image">
+        <div class="flex-1">
+            <h3 class="font-medium product-name"></h3>
+            <p class="text-gray-500 text-sm product-variant"></p>
+            <p class="text-gray-500 text-sm product-quantity"></p>
+        </div>
+        <div class="text-right">
+            <p class="text-gray-400 line-through text-sm product-original-price"></p>
+            <p class="text-orange-500 product-final-price"></p>
+        </div>
+    </div>
+</template>
+<script>
+    console.log('Purchase page initializing...'); // Debug log
+</script>
+<script src="/js/purchase.js" defer></script>
