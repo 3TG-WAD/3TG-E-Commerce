@@ -7,6 +7,7 @@ const flash = require('express-flash');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const authService = require('../modules/auth/services/auth.service');
 const categoryController = require('../modules/product/controllers/category.controller');
+const Category = require('../modules/product/models/category');
 
 const configureExpress = (app) => {
   // Middleware
@@ -83,7 +84,7 @@ const configureExpress = (app) => {
     try {
       // Chỉ lấy categories cho non-API routes
       if (!req.xhr && !req.path.startsWith('/api/')) {
-        const categories = await categoryController.getAllCategories(req);
+        const categories = await Category.find({});
         res.locals.categories = categories;
       }
       next();

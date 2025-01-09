@@ -1,223 +1,193 @@
-const Category = require('../models/category');
 const Product = require('../models/product');
 const Variant = require('../models/variant');
+const Category = require('../models/category');
+const Manufacturer = require('../models/manufacturer');
 const { formatToVND } = require('../../../helpers/currencyFormatter');
 
 const categoryController = {
-  getAllCategories: async (req, res, next) => {
-    try {
-      const categories = await Category.find().sort({ category_name: 1 });
-      
-      // Nếu được gọi từ API endpoint
-      if (req.xhr || req.headers.accept?.includes('application/json')) {
-        return res.json({
-          success: true,
-          data: categories
-        });
-      }
-      
-      // Nếu được gọi từ middleware
-      return categories;
-      
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      if (req.xhr || req.headers.accept?.includes('application/json')) {
-        return res.status(500).json({
-          success: false,
-          message: error.message
-        });
-      }
-      throw error;
-    }
-  },
-
-  getCategoryPage: async (req, res) => {
-    try {
-      const { slug } = req.params;
-      const { sort = 'popular', page = 1 } = req.query;
-      const limit = 9;
-      
-      // Lấy thông tin category
-      const category = await Category.findOne({ slug });
-      if (!category) {
-        return res.status(404).render('error/404', { title: 'Category Not Found' });
-      }
-
-      // Lấy tất cả categories cho sidebar
-      const categories = await Category.find().sort({ category_name: 1 });
-
-      // Lấy unique manufacturers từ products
-      const manufacturers = await Product.distinct('manufacturer_id');
-      const formattedManufacturers = manufacturers.map(id => ({
-        id,
-        name: id.split('_').map(word => 
-          word.charAt(0) + word.slice(1).toLowerCase()
-        ).join(' ')
-      }));
-
-      // Query sản phẩm với filters
-      const query = { category_id: category.category_id };
-      
-      // Tính total và phân trang
-      const total = await Product.countDocuments(query);
-      const totalPages = Math.ceil(total / limit);
-
-      // Sort options
-      const sortOptions = {
-        'popular': { creation_time: -1 },
-        'newest': { creation_time: -1 },
-        'price-asc': { price: 1 },
-        'price-desc': { price: -1 }
-      };
-
-      // Lấy sản phẩm
-      const products = await Product.find(query)
-        .sort(sortOptions[sort])
-        .skip((page - 1) * limit)
-        .limit(limit);
-
-      // Format sản phẩm với variants
-      const productIds = products.map(p => p.product_id);
-      const variants = await Variant.find({
-        product_id: { $in: productIds }
-      });
-
-      const variantsByProduct = variants.reduce((acc, variant) => {
-        if (!acc[variant.product_id]) {
-          acc[variant.product_id] = [];
+    getAllCategories: async (req) => {
+        try {
+            const categories = await Category.find({});
+            return categories;
+        } catch (error) {
+            console.error('Error getting categories:', error);
+            return [];
         }
-        acc[variant.product_id].push(variant);
-        return acc;
-      }, {});
+    },
 
-      const formattedProducts = products.map(product => {
-        const productVariants = variantsByProduct[product.product_id] || [];
-        const cheapestVariant = productVariants.length > 0 
-          ? productVariants.reduce((min, curr) => curr.price < min.price ? curr : min, productVariants[0])
-          : null;
+    getCategoryPage: async (req, res) => {
+        try {
+            const { slug } = req.params;
+            const page = parseInt(req.query.page) || 1;
+            const limit = 9;
+            
+            const category = await Category.findOne({ slug });
+            if (!category) {
+                return res.status(404).render('error/404', {
+                    title: '404 - Page Not Found'
+                });
+            }
 
-        return {
-          ...product.toObject(),
-          price: cheapestVariant?.price || 0,
-          discount: cheapestVariant?.discount || 0,
-          finalPrice: cheapestVariant ? 
-            cheapestVariant.price * (1 - cheapestVariant.discount/100) : 0
-        };
-      });
+            const manufacturers = await Manufacturer.find({});
 
-      res.render('category/index', {
-        title: `${category.category_name} - Shop.co`,
-        category,
-        categories,  // Thêm categories cho sidebar
-        manufacturers: formattedManufacturers, // Thêm manufacturers
-        products: formattedProducts,
-        pagination: {
-          current: parseInt(page),
-          total: totalPages
-        },
-        filters: {
-          sort,
-          manufacturers: req.query.manufacturers?.split(',') || []
-        },
-        total,
-        formatToVND
-      });
+            const currentSort = req.query.sort || 'popular';
+            const selectedManufacturers = Array.isArray(req.query.manufacturer) ? 
+                req.query.manufacturer : 
+                req.query.manufacturer ? [req.query.manufacturer] : [];
 
-    } catch (error) {
-      console.error('Error in getCategoryPage:', error);
-      res.status(500).render('error/500', {
-        title: 'Error',
-        message: error.message
-      });
-    }
-  },
+            const baseQuery = { category_id: category.category_id };
+            if (selectedManufacturers.length > 0) {
+                baseQuery.manufacturer_id = { $in: selectedManufacturers };
+            }
 
-  searchProducts: async (req, res) => {
-    try {
-      const { 
-        category_id,
-        manufacturers,
-        sort = 'popular',
-        page = 1 
-      } = req.body;
-      
-      const limit = 9;
-      const query = {};
-      
-      // Add category filter
-      if (category_id) {
-        query.category_id = category_id;
-      }
+            const total = await Product.countDocuments(baseQuery);
+            
+            const products = await Product.find(baseQuery)
+                .sort({ creation_time: -1 })
+                .skip((page - 1) * limit)
+                .limit(limit);
 
-      // Add manufacturer filter
-      if (manufacturers && manufacturers.length > 0) {
-        query.manufacturer_id = { $in: manufacturers };
-      }
+            res.render('category/index', {
+                title: `${category.category_name} - SixT Store`,
+                category,
+                manufacturers,
+                products,
+                filters: {
+                    sort: currentSort,
+                    manufacturers: selectedManufacturers
+                },
+                pagination: {
+                    current: page,
+                    total: Math.ceil(total / limit)
+                },
+                total,
+                formatToVND
+            });
 
-      // Sort options
-      const sortOptions = {
-        'popular': { creation_time: -1 },
-        'newest': { creation_time: -1 },
-        'price-asc': { price: 1 },
-        'price-desc': { price: -1 }
-      };
-
-      // Count total products
-      const total = await Product.countDocuments(query);
-      const totalPages = Math.ceil(total / limit);
-
-      // Get products
-      const products = await Product.find(query)
-        .sort(sortOptions[sort])
-        .skip((page - 1) * limit)
-        .limit(limit);
-
-      // Format products with variants
-      const productIds = products.map(p => p.product_id);
-      const variants = await Variant.find({
-        product_id: { $in: productIds }
-      });
-
-      const variantsByProduct = variants.reduce((acc, variant) => {
-        if (!acc[variant.product_id]) {
-          acc[variant.product_id] = [];
+        } catch (error) {
+            console.error('Category page error:', error);
+            res.status(500).render('error/500', {
+                title: 'Error - SixT Store'
+            });
         }
-        acc[variant.product_id].push(variant);
-        return acc;
-      }, {});
+    },
 
-      const formattedProducts = products.map(product => {
-        const productVariants = variantsByProduct[product.product_id] || [];
-        const cheapestVariant = productVariants.length > 0 
-          ? productVariants.reduce((min, curr) => curr.price < min.price ? curr : min, productVariants[0])
-          : null;
+    filterProducts: async (req, res) => {
+        try {
+            const { categoryId } = req.params;
+            const { manufacturers, sort = 'popular' } = req.body;
+            
+            console.log('Filter request received:', {
+                categoryId,
+                manufacturers,
+                sort
+            });
 
-        return {
-          ...product.toObject(),
-          price: cheapestVariant?.price || 0,
-          discount: cheapestVariant?.discount || 0,
-          finalPrice: cheapestVariant ? 
-            cheapestVariant.price * (1 - cheapestVariant.discount/100) : 0
-        };
-      });
+            // Tìm category dựa trên slug
+            const category = await Category.findOne({ slug: categoryId });
+            if (!category) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Category not found'
+                });
+            }
 
-      res.json({
-        products: formattedProducts,
-        pagination: {
-          current: parseInt(page),
-          total: totalPages
-        },
-        total
-      });
+            // Query cơ bản với category
+            const query = { category_id: category.category_id };
 
-    } catch (error) {
-      console.error('Error in searchProducts:', error);
-      res.status(500).json({
-        success: false,
-        message: error.message
-      });
+            // Thêm filter theo manufacturers nếu có
+            if (manufacturers && manufacturers.length > 0) {
+                query.manufacturer_id = { $in: manufacturers };
+            }
+
+            // Debug log
+            console.log('Query:', query);
+
+            // Lấy sản phẩm với filters
+            const products = await Product.find(query);
+            
+            // Debug log
+            console.log('Found products:', products.length);
+
+            // Lấy variants cho các sản phẩm
+            const productIds = products.map(p => p.product_id);
+            const variants = await Variant.find({
+                product_id: { $in: productIds }
+            });
+
+            // Gom variants theo product_id
+            const variantsByProduct = variants.reduce((acc, variant) => {
+                if (!acc[variant.product_id]) {
+                    acc[variant.product_id] = [];
+                }
+                acc[variant.product_id].push(variant);
+                return acc;
+            }, {});
+
+            // Format kết quả trả về
+            const formattedProducts = products.map(product => {
+                const productVariants = variantsByProduct[product.product_id] || [];
+                
+                // Tính giá và discount
+                let minPrice = Infinity;
+                let maxDiscount = 0;
+
+                productVariants.forEach(variant => {
+                    if (variant.price < minPrice) {
+                        minPrice = variant.price;
+                    }
+                    if (variant.discount > maxDiscount) {
+                        maxDiscount = variant.discount;
+                    }
+                });
+
+                if (minPrice === Infinity) {
+                    minPrice = 0;
+                }
+
+                return {
+                    ...product.toObject(),
+                    finalPrice: minPrice * (1 - maxDiscount/100),
+                    price: minPrice,
+                    maxDiscount: maxDiscount,
+                    photos: product.photos || []
+                };
+            });
+
+            res.json({
+                success: true,
+                data: {
+                    products: formattedProducts,
+                    pagination: {
+                        totalProducts: products.length
+                    }
+                }
+            });
+
+        } catch (error) {
+            console.error('Filter products error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error filtering products',
+                error: error.message
+            });
+        }
+    },
+
+    searchProducts: async (req, res) => {
+        try {
+            const { query } = req.body;
+            const products = await Product.find({
+                $or: [
+                    { product_name: { $regex: query, $options: 'i' } },
+                    { description: { $regex: query, $options: 'i' } }
+                ]
+            });
+            res.json({ success: true, products });
+        } catch (error) {
+            res.status(500).json({ success: false, message: error.message });
+        }
     }
-  }
 };
 
 module.exports = categoryController;

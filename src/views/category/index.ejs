@@ -33,6 +33,7 @@
 
         <!-- Sort By -->
         <div class="mb-6">
+          <h3 class="font-medium mb-3">Sort By</h3>
           <select name="sort" id="sortBy" class="w-full border-gray-300 rounded-md text-sm">
             <option value="popular" <%= filters.sort === 'popular' ? 'selected' : '' %>>Most Popular</option>
             <option value="newest" <%= filters.sort === 'newest' ? 'selected' : '' %>>Newest</option>
@@ -49,9 +50,9 @@
               <label class="flex items-center">
                 <input type="checkbox" 
                        name="manufacturer" 
-                       value="<%= brand.id %>"
+                       value="<%= brand.manufacturer_id %>"
                        class="form-checkbox"
-                       <%= filters.manufacturers?.includes(brand.id) ? 'checked' : '' %>>
+                       <%= filters.manufacturers?.includes(brand.manufacturer_id) ? 'checked' : '' %>>
                 <span class="ml-2"><%= brand.name %></span>
               </label>
             <% }); %>
@@ -122,5 +123,5 @@
 </div>
 
 <script type="module">
-  import ProductFilterService from '/js/modules/product/services/filter.service.js';
+  import ProductFilterService from '../../modules/product/services/filter.service.js';
 </script> 

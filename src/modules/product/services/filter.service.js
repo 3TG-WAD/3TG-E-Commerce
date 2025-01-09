@@ -1,196 +1,154 @@
 class ProductFilterService {
     constructor() {
         this.initializeElements();
+        this.initializeFiltersFromURL();
         this.initializeEventListeners();
     }
 
     initializeElements() {
         this.filterForm = document.getElementById('filterForm');
-        this.sortBySelect = document.getElementById('sortBy');
-        this.applyFiltersBtn = document.getElementById('applyFilters');
+        this.sortSelect = document.getElementById('sortBy');
+        this.manufacturerCheckboxes = document.querySelectorAll('input[name="manufacturer"]');
         this.productsGrid = document.getElementById('productsGrid');
-        this.paginationContainer = document.getElementById('paginationNumbers');
+        this.productCount = document.querySelector('.product-count');
+        this.applyButton = document.getElementById('applyFilters');
+        // Lấy category_id từ URL thay vì data attribute
+        this.categoryId = window.location.pathname.split('/').pop();
+    }
+
+    initializeFiltersFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        
+        // Set sort value
+        const sortValue = params.get('sort') || 'popular';
+        if (this.sortSelect) {
+            this.sortSelect.value = sortValue;
+        }
+
+        // Set manufacturer checkboxes
+        const manufacturer = params.get('manufacturer')?.split(',') || [];
+        this.manufacturerCheckboxes.forEach(checkbox => {
+            checkbox.checked = manufacturer.includes(checkbox.value);
+        });
     }
 
     initializeEventListeners() {
-        this.applyFiltersBtn.addEventListener('click', () => this.handleFilters());
-        this.sortBySelect.addEventListener('change', () => this.handleFilters());
-        
-        // Pagination event delegation
-        this.paginationContainer.addEventListener('click', (e) => {
-            const pageButton = e.target.closest('[data-page]');
-            if (pageButton) {
-                this.handleFilters();
-            }
+        this.applyButton?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.handleFilters();
+        });
+
+        this.sortSelect?.addEventListener('change', () => {
+            this.handleFilters();
         });
     }
 
     async handleFilters() {
-        const query = this.buildElasticSearchQuery();
-        
         try {
-            const response = await this.fetchFilteredProducts(query);
-            this.updateUI(response);
+            const selectedManufacturers = Array.from(this.manufacturerCheckboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+
+            const sortValue = this.sortSelect?.value || 'popular';
+
+            console.log('Sending filter request:', { // Debug log
+                manufacturers: selectedManufacturers,
+                sort: sortValue
+            });
+
+            // Cập nhật URL trước
+            this.updateURL(selectedManufacturers, sortValue);
+
+            const response = await fetch(`/categories/${this.categoryId}/filter`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    manufacturers: selectedManufacturers,
+                    sort: sortValue
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (data.success) {
+                this.updateUI(data);
+            }
+
         } catch (error) {
-            console.error('Error fetching products:', error);
+            console.error('Error in handleFilters:', error);
         }
     }
 
-    buildElasticSearchQuery() {
-        const selectedBrands = [...document.querySelectorAll('input[type="checkbox"][name="brand"]:checked')]
-            .map(cb => cb.value);
+    updateURL(manufacturers, sort) {
+        const params = new URLSearchParams();
         
-        const selectedColor = document.querySelector('.ring-gray-400')?.dataset.color;
-        const selectedSize = document.querySelector('.bg-gray-200')?.dataset.size;
-        const selectedFit = document.querySelector('input[name="fit"]:checked')?.value;
-        const sortBy = this.sortBySelect.value;
-        const page = document.querySelector('.bg-black[data-page]')?.dataset.page || 1;
-        const categoryId = document.querySelector('[data-category-id]')?.dataset.categoryId;
-
-        const query = {
-            query: {
-                bool: {
-                    must: [
-                        { term: { category_id: categoryId } }
-                    ]
-                }
-            },
-            sort: [{ [sortBy.split(':')[0]]: sortBy.split(':')[1] }],
-            from: (page - 1) * 12,
-            size: 12
-        };
-
-        // Add brand filter
-        if (selectedBrands.length) {
-            query.query.bool.must.push({
-                terms: { manufacturer_id: selectedBrands }
-            });
+        // Thêm sort parameter nếu khác giá trị mặc định
+        if (sort && sort !== 'popular') {
+            params.set('sort', sort);
+        }
+        
+        // Thêm manufacturer parameter nếu có
+        if (manufacturers.length > 0) {
+            params.set('manufacturer', manufacturers.join(','));
         }
 
-        // Add color filter
-        if (selectedColor) {
-            query.query.bool.must.push({
-                term: { "specifications.color": selectedColor }
-            });
-        }
-
-        // Add size filter
-        if (selectedSize) {
-            query.query.bool.must.push({
-                term: { "specifications.size_range": selectedSize }
-            });
-        }
-
-        // Add fit filter
-        if (selectedFit) {
-            query.query.bool.must.push({
-                term: { "specifications.fit": selectedFit }
-            });
-        }
-
-        return query;
-    }
-
-    async fetchFilteredProducts(query) {
-        const response = await fetch('/api/products/search', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                category_id: document.querySelector('[data-category-id]').dataset.categoryId,
-                manufacturers: [...document.querySelectorAll('input[name="manufacturer"]:checked')].map(cb => cb.value),
-                sort: document.getElementById('sortBy').value,
-                page: document.querySelector('.bg-black[data-page]')?.dataset.page || 1
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        return response.json();
+        // Cập nhật URL không reload trang
+        const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+        window.history.pushState({}, '', newUrl);
     }
 
     updateUI(data) {
-        this.updateProductsGrid(data.products);
-        this.updatePagination(data.total, data.currentPage);
-        this.updateProductCount(data.total);
-    }
+        if (!data.success) return;
 
-    updateProductsGrid(products) {
-        // Assuming you have a template function to render product cards
-        const html = products.map(product => this.renderProductCard(product)).join('');
-        this.productsGrid.innerHTML = html;
-    }
+        const { products } = data.data;
 
-    updatePagination(total, currentPage) {
-        const totalPages = Math.ceil(total / 12);
-        let paginationHtml = '';
-
-        for (let i = 1; i <= totalPages; i++) {
-            paginationHtml += `
-                <button class="w-8 h-8 flex items-center justify-center rounded 
-                    ${currentPage === i ? 'bg-black text-white' : 'hover:bg-gray-100'}"
-                    data-page="${i}">
-                    ${i}
-                </button>
-            `;
+        // Cập nhật grid sản phẩm
+        if (this.productsGrid) {
+            this.productsGrid.innerHTML = products.map(product => `
+                <div class="group">
+                    <a href="/products/${product.product_id}" class="block">
+                        <div class="bg-gray-100 rounded-lg mb-3 aspect-square overflow-hidden">
+                            <img 
+                                src="${product.photos[0]}" 
+                                alt="${product.product_name}"
+                                class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                            >
+                        </div>
+                        <h3 class="font-medium mb-1.5">${product.product_name}</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold">${this.formatPrice(product.finalPrice)}</span>
+                            ${product.maxDiscount > 0 ? `
+                                <span class="text-sm text-gray-500 line-through">
+                                    ${this.formatPrice(product.priceRange.min)}
+                                </span>
+                                <span class="text-sm text-red-500">-${product.maxDiscount}%</span>
+                            ` : ''}
+                        </div>
+                    </a>
+                </div>
+            `).join('');
         }
 
-        this.paginationContainer.innerHTML = paginationHtml;
-    }
-
-    updateProductCount(total) {
-        const countElement = document.querySelector('.product-count');
-        if (countElement) {
-            countElement.textContent = `Showing 1-12 of ${total} Products`;
+        // Cập nhật số lượng sản phẩm
+        if (this.productCount) {
+            this.productCount.textContent = `${data.data.pagination.totalProducts} Products`;
         }
     }
 
-    renderProductCard(product) {
-        return `
-            <div class="group">
-                <a href="/products/${product.product_id}" class="block">
-                    <div class="bg-gray-100 rounded-lg mb-3 aspect-square overflow-hidden">
-                        <img 
-                            src="${product.photos[0]}" 
-                            alt="${product.product_name}"
-                            class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                        >
-                    </div>
-                    <h3 class="font-medium mb-1.5">${product.product_name}</h3>
-                    <div class="flex items-center gap-1.5 mb-1.5">
-                        ${this.renderRatingStars(product.rating)}
-                        <span class="text-sm text-gray-500">${product.rating}/5</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="font-bold">$${product.finalPrice}</span>
-                        ${product.discount ? `
-                            <span class="text-sm text-gray-500 line-through">$${product.price}</span>
-                            <span class="text-sm text-red-500">-${product.discount}%</span>
-                        ` : ''}
-                    </div>
-                </a>
-            </div>
-        `;
-    }
-
-    renderRatingStars(rating) {
-        let starsHtml = '';
-        for (let i = 0; i < 5; i++) {
-            starsHtml += `
-                <svg class="w-4 h-4 ${i < Math.floor(rating) ? 'text-yellow-400' : 'text-gray-300'}" 
-                     fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                </svg>
-            `;
-        }
-        return starsHtml;
+    formatPrice(price) {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(price);
     }
 }
 
-// Initialize the service when the DOM is loaded
+// Khởi tạo service khi document ready
 document.addEventListener('DOMContentLoaded', () => {
     new ProductFilterService();
 });
