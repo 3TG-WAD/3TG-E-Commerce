@@ -1,4 +1,4 @@
-# **E-Commerce Application by 3TG**
+# **E-Commerce Application by SixT**
 
 A comprehensive e-commerce web application built using **Express.js** with the **MVC (Model-View-Controller)** architecture. This project provides functionalities for managing products, users, orders, and authentication, designed for scalability and maintainability.
 
