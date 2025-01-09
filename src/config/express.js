@@ -82,11 +82,13 @@ const configureExpress = (app) => {
   const authRoutes = require('../modules/auth/routes/auth.routes.js');
   const oauth2Routes = require('../modules/auth/routes/oauth2.routes.js');
   const authController = require('../modules/auth/controllers/auth.controller.js'); 
+  const orderRoutes = require('../modules/order/routes/order.routes');
 
   app.use('/', landingRoutes);
   app.use('/auth', authRoutes);
   app.use('/oauth2', oauth2Routes);
 
+  app.use('/', orderRoutes);
   // Add Google callback route at root level
   app.get('/authenticate', 
     passport.authenticate('google', { 
