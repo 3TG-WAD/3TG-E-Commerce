@@ -111,22 +111,22 @@ class ProductFilterService {
         if (this.productsGrid) {
             this.productsGrid.innerHTML = products.map(product => `
                 <div class="group">
-                    <a href="/products/${product.product_id}" class="block">
+                    <a href="/products/${product.id}" class="block">
                         <div class="bg-gray-100 rounded-lg mb-3 aspect-square overflow-hidden">
                             <img 
-                                src="${product.photos[0]}" 
-                                alt="${product.product_name}"
+                                src="${product.image}" 
+                                alt="${product.name}"
                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                             >
                         </div>
-                        <h3 class="font-medium mb-1.5">${product.product_name}</h3>
+                        <h3 class="font-medium mb-1.5">${product.name}</h3>
                         <div class="flex items-center gap-2">
-                            <span class="font-bold">${this.formatPrice(product.finalPrice)}</span>
-                            ${product.maxDiscount > 0 ? `
+                            <span class="font-bold">${product.finalPrice}</span>
+                            ${product.discount > 0 ? `
                                 <span class="text-sm text-gray-500 line-through">
-                                    ${this.formatPrice(product.priceRange.min)}
+                                    ${formatToVND(product.price)}
                                 </span>
-                                <span class="text-sm text-red-500">-${product.maxDiscount}%</span>
+                                <span class="text-sm text-red-500">-${product.discount}%</span>
                             ` : ''}
                         </div>
                     </a>

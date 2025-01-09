@@ -2,6 +2,7 @@ const Product = require('../models/product');
 const Variant = require('../models/variant');
 const Category = require('../models/category');
 const Manufacturer = require('../models/manufacturer');
+const ProductService = require('../services/product.service');
 const { formatToVND } = require('../../../helpers/currencyFormatter');
 
 const categoryController = {
@@ -42,10 +43,36 @@ const categoryController = {
 
             const total = await Product.countDocuments(baseQuery);
             
-            const products = await Product.find(baseQuery)
+            const rawProducts = await Product.find(baseQuery)
                 .sort({ creation_time: -1 })
                 .skip((page - 1) * limit)
                 .limit(limit);
+
+            const productService = new ProductService();
+            const products = await Promise.all(rawProducts.map(async (product) => {
+                const variants = await Variant.find({ product_id: product.product_id });
+                const priceInfo = productService.calculateProductPrice(variants);
+
+                console.log('Price info for product:', product.product_name, priceInfo);
+
+                return {
+                    ...product.toObject(),
+                    id: product.product_id,
+                    name: product.product_name,
+                    description: product.description,
+                    image: product.photos[0],
+                    price: priceInfo.price,
+                    discount: priceInfo.discount,
+                    finalPrice: priceInfo.finalPrice
+                };
+            }));
+
+            console.log('Final products data:', products.map(p => ({
+                name: p.name,
+                price: p.price,
+                finalPrice: p.finalPrice,
+                discount: p.discount
+            })));
 
             res.render('category/index', {
                 title: `${category.category_name} - SixT Store`,
@@ -100,59 +127,44 @@ const categoryController = {
                 query.manufacturer_id = { $in: manufacturers };
             }
 
-            // Debug log
-            console.log('Query:', query);
+            // Định nghĩa các option sort
+            const sortOptions = {
+                'popular': { sold_quantity: -1 },
+                'newest': { creation_time: -1 },
+                'price-asc': { base_price: 1 },
+                'price-desc': { base_price: -1 }
+            };
 
-            // Lấy sản phẩm với filters
-            const products = await Product.find(query);
-            
-            // Debug log
-            console.log('Found products:', products.length);
+            // Lấy sản phẩm với filters và sort
+            const products = await Product.find(query)
+                .sort(sortOptions[sort] || sortOptions.popular);
 
-            // Lấy variants cho các sản phẩm
-            const productIds = products.map(p => p.product_id);
-            const variants = await Variant.find({
-                product_id: { $in: productIds }
-            });
-
-            // Gom variants theo product_id
-            const variantsByProduct = variants.reduce((acc, variant) => {
-                if (!acc[variant.product_id]) {
-                    acc[variant.product_id] = [];
-                }
-                acc[variant.product_id].push(variant);
-                return acc;
-            }, {});
-
-            // Format kết quả trả về
-            const formattedProducts = products.map(product => {
-                const productVariants = variantsByProduct[product.product_id] || [];
-                
-                // Tính giá và discount
-                let minPrice = Infinity;
-                let maxDiscount = 0;
-
-                productVariants.forEach(variant => {
-                    if (variant.price < minPrice) {
-                        minPrice = variant.price;
-                    }
-                    if (variant.discount > maxDiscount) {
-                        maxDiscount = variant.discount;
-                    }
-                });
-
-                if (minPrice === Infinity) {
-                    minPrice = 0;
-                }
+            // Lấy variants và tính giá sử dụng ProductService
+            const productService = new ProductService();
+            const formattedProducts = await Promise.all(products.map(async (product) => {
+                const variants = await Variant.find({ product_id: product.product_id });
+                const priceInfo = productService.calculateProductPrice(variants);
 
                 return {
                     ...product.toObject(),
-                    finalPrice: minPrice * (1 - maxDiscount/100),
-                    price: minPrice,
-                    maxDiscount: maxDiscount,
-                    photos: product.photos || []
+                    id: product.product_id,
+                    name: product.product_name,
+                    description: product.description,
+                    image: product.photos[0],
+                    price: priceInfo.price,
+                    discount: priceInfo.discount,
+                    finalPrice: formatToVND(priceInfo.finalPrice)
                 };
-            });
+            }));
+
+            // Sort lại theo giá nếu cần
+            if (sort === 'price-asc' || sort === 'price-desc') {
+                formattedProducts.sort((a, b) => {
+                    return sort === 'price-asc' 
+                        ? a.finalPrice - b.finalPrice 
+                        : b.finalPrice - a.finalPrice;
+                });
+            }
 
             res.json({
                 success: true,

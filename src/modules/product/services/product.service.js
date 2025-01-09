@@ -113,6 +113,46 @@ class ProductService {
       throw new Error('Error fetching dress styles: ' + error.message);
     }
   }
+
+  calculateProductPrice(variants) {
+    if (!variants || variants.length === 0) {
+      return {
+        price: 0,
+        discount: 0,
+        finalPrice: 0
+      };
+    }
+
+    // Tìm variant có giá thấp nhất và discount cao nhất
+    let minPrice = Infinity;
+    let maxDiscount = 0;
+
+    variants.forEach(variant => {
+      const price = Number(variant.price) * 1000;
+      if (!isNaN(price) && price < minPrice) {
+        minPrice = price;
+      }
+      
+      const discount = Number(variant.discount);
+      if (!isNaN(discount) && discount > maxDiscount) {
+        maxDiscount = discount;
+      }
+    });
+
+    // Nếu không tìm thấy giá hợp lệ
+    if (minPrice === Infinity || isNaN(minPrice)) {
+      minPrice = 0;
+    }
+
+    const finalPrice = Math.round(minPrice * (1 - maxDiscount/100));
+
+    return {
+      price: minPrice,
+      discount: maxDiscount,
+      finalPrice: finalPrice
+    };
+  }
 }
 
-module.exports = new ProductService();
+// Export class thay vì instance
+module.exports = ProductService;
