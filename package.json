@@ -5,8 +5,8 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "build:css": "tailwindcss -i ./public/css/tailwind.css -o ./public/css/stylesheet.css --watch",
-    "build": "postcss ./public/css/tailwind.css -o ./public/css/stylesheet.css"
+    "build:css": "tailwindcss -i ./src/public/css/tailwind.css -o ./src/public/css/stylesheet.css --watch",
+    "build": "tailwindcss -i ./src/public/css/tailwind.css -o ./src/public/css/stylesheet.css"
   },
   "keywords": [],
   "author": "",
