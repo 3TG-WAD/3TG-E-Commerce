@@ -15,6 +15,9 @@ module.exports = function (app) {
     try {
       const user = await User.findOne({ email });
       if (!user) return done(null, false, { message: 'Incorrect email.' });
+      if (user.authProvider === 'google') {
+        return done(null, false, { message: 'Please login with Google.' });
+      }
       if (!user.isActive) return done(null, false, { message: 'Account not activated.' });
       
       const isMatch = await user.comparePassword(password);

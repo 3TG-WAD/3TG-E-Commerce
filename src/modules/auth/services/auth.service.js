@@ -117,6 +117,35 @@ class AuthService {
 
     return user;
   }
+  async handleGoogleAuth(profile) {
+    try {
+      let user = await User.findOne({ email: profile.emails[0].value });
+      
+      if (!user) {
+        // Tạo user mới nếu chưa tồn tại
+        user = await User.create({
+          username: profile.displayName,
+          email: profile.emails[0].value,
+          password: crypto.randomBytes(16).toString('hex'),
+          isActive: true,
+          authProvider: 'google',
+          googleId: profile.id,
+          avatar: profile.photos[0]?.value || null
+        });
+      } else if (!user.googleId) {
+        // Cập nhật thông tin Google nếu user đã tồn tại
+        user.googleId = profile.id;
+        user.authProvider = 'google';
+        user.avatar = profile.photos[0]?.value || user.avatar;
+        await user.save();
+      }
+
+      return user;
+    } catch (error) {
+      console.error('Handle Google auth error:', error);
+      throw new Error('Failed to process Google authentication');
+    }
+  }
 }
 
 module.exports = new AuthService();
