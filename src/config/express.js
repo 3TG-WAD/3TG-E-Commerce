@@ -83,7 +83,8 @@ const configureExpress = (app) => {
   const oauth2Routes = require('../modules/auth/routes/oauth2.routes.js');
   const authController = require('../modules/auth/controllers/auth.controller.js'); 
   const orderRoutes = require('../modules/order/routes/order.routes');
-
+  const profileRoutes = require('../modules/user/routes/profile.routes');
+  app.use('/', profileRoutes);
   app.use('/', landingRoutes);
   app.use('/auth', authRoutes);
   app.use('/oauth2', oauth2Routes);
