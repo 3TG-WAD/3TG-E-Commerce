@@ -47,6 +47,12 @@ const userSchema = new mongoose.Schema({
   activationTokenExpires: Date, // Expiration date for activation token
   resetPasswordToken: String, // Token for password reset
   resetPasswordExpires: Date, // Expiration date for reset password token
+  authProvider: {
+    type: String,
+    enum: ['local', 'google'],
+    default: 'local'
+  },
+  googleId: String,
 });
 
 // Hash password before saving

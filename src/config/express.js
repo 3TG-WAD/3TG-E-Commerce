@@ -4,6 +4,8 @@ const passport = require('passport');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
 const flash = require('express-flash');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const authService = require('../modules/auth/services/auth.service');
 
 const configureExpress = (app) => {
   // Middleware
@@ -33,6 +35,26 @@ const configureExpress = (app) => {
   app.use(passport.initialize());
   app.use(passport.session());
   require('./passport')(app);  // Thêm cấu hình passport
+  require('./passport')(app);
+
+  // Google OAuth
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: 'http://localhost:3000/authenticate',
+      },
+      async function (accessToken, refreshToken, profile, done) {
+        try {
+          const user = await authService.handleGoogleAuth(profile);
+          return done(null, user);
+        } catch (error) {
+          return done(error, null);
+        }
+      }
+    )
+  );
 
   // Flash messages
   app.use(flash());
@@ -58,9 +80,21 @@ const configureExpress = (app) => {
   // Routes
   const landingRoutes = require('../modules/home/routes/home.routes.js');
   const authRoutes = require('../modules/auth/routes/auth.routes.js');
+  const oauth2Routes = require('../modules/auth/routes/oauth2.routes.js');
+  const authController = require('../modules/auth/controllers/auth.controller.js'); 
 
   app.use('/', landingRoutes);
   app.use('/auth', authRoutes);
+  app.use('/oauth2', oauth2Routes);
+
+  // Add Google callback route at root level
+  app.get('/authenticate', 
+    passport.authenticate('google', { 
+      failureRedirect: '/auth/login',
+      failureFlash: true 
+    }),
+    authController.googleCallback
+  );
 
   // Error handling middleware
   app.use((err, req, res, next) => {

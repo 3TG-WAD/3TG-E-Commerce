@@ -32,6 +32,9 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res, next) => {
   try {
+    if (req.isAuthenticated() && req.user.authProvider === 'google') {
+      return res.redirect('/');
+    }
     await authService.loginUser(req, res, next);
     return res.redirect('/');
   } catch (error) {
@@ -128,4 +131,16 @@ exports.resetPassword = async (req, res) => {
             message: error.message || 'An error occurred. Please try again.'
         });
     }
+};
+
+exports.googleCallback = (req, res) => {
+  // Check if user is authenticated
+  if (!req.user) {
+    req.flash('error', 'Google authentication failed');
+    return res.redirect('/auth/login');
+  }
+
+  // Redirect to home page after successful login
+  req.flash('success', 'Successfully logged in with Google!');
+  res.redirect('/');
 };
