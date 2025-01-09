@@ -6,6 +6,7 @@ const expressLayouts = require('express-ejs-layouts');
 const flash = require('express-flash');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const authService = require('../modules/auth/services/auth.service');
+const categoryController = require('../modules/product/controllers/category.controller');
 
 const configureExpress = (app) => {
   // Middleware
@@ -77,6 +78,22 @@ const configureExpress = (app) => {
     next();
   });
 
+  // Thêm middleware để lấy categories cho tất cả các routes
+  app.use(async (req, res, next) => {
+    try {
+      // Chỉ lấy categories cho non-API routes
+      if (!req.xhr && !req.path.startsWith('/api/')) {
+        const categories = await categoryController.getAllCategories(req);
+        res.locals.categories = categories;
+      }
+      next();
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      res.locals.categories = [];
+      next();
+    }
+  });
+
   // Routes
   const landingRoutes = require('../modules/home/routes/home.routes.js');
   const authRoutes = require('../modules/auth/routes/auth.routes.js');
@@ -84,6 +101,8 @@ const configureExpress = (app) => {
   const authController = require('../modules/auth/controllers/auth.controller.js'); 
   const orderRoutes = require('../modules/order/routes/order.routes');
   const profileRoutes = require('../modules/user/routes/profile.routes');
+  const categoryRoutes = require('../modules/product/routes/category.routes');
+  app.use('/', categoryRoutes);
   app.use('/', profileRoutes);
   app.use('/', landingRoutes);
   app.use('/auth', authRoutes);

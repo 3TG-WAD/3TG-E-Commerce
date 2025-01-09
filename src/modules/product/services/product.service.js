@@ -1,15 +1,53 @@
 const Product = require("../models/product");
 const Variant = require("../models/variant");
+const { formatToVND } = require('../../../helpers/currencyFormatter');
 
 class ProductService {
   async getNewArrivals() {
     try {
+      // Kiểm tra xem có lấy được variants không
+      const variants = await Variant.find().select('product_id price discount');
+      console.log('Variants found:', variants.length); // Debug log
+
+      const variantsByProduct = variants.reduce((acc, variant) => {
+        if (!acc[variant.product_id]) {
+          acc[variant.product_id] = [];
+        }
+        acc[variant.product_id].push(variant);
+        return acc;
+      }, {});
+
       const products = await Product.find()
-        .sort({ createdAt: -1 })
+        .sort({ creation_time: -1 })
         .limit(4)
-        .select('name description image price discount');
-      return products;
+        .select('product_id product_name description photos');
+      console.log('Products found:', products.length); // Debug log
+
+      const newProducts = products.map(product => {
+        const productVariants = variantsByProduct[product.product_id] || [];
+        console.log(`Variants for product ${product.product_id}:`, productVariants.length); // Debug log
+        
+        const cheapestVariant = productVariants.reduce((min, curr) => 
+          curr.price < min.price ? curr : min
+        , productVariants[0]);
+
+        return {
+          id: product.product_id,
+          name: product.product_name,
+          description: product.description,
+          image: product.photos[0],
+          price: cheapestVariant ? cheapestVariant.price : null,
+          discount: cheapestVariant ? cheapestVariant.discount : 0,
+          finalPrice: formatToVND(
+            cheapestVariant ? 
+            cheapestVariant.price * (1 - cheapestVariant.discount/100) : null
+          )
+        };
+      });
+
+      return newProducts;
     } catch (error) {
+      console.error('Error in getNewArrivals:', error); // Thêm detailed error logging
       throw new Error('Error fetching new arrivals: ' + error.message);
     }
   }
@@ -37,8 +75,6 @@ class ProductService {
           curr.price < min.price ? curr : min
         , productVariants[0]);
 
-        console.log(cheapestVariant);
-
         return {
           id: product.product_id,
           name: product.product_name,
@@ -46,8 +82,10 @@ class ProductService {
           image: product.photos[0],
           price: cheapestVariant ? cheapestVariant.price : null,
           discount: cheapestVariant ? cheapestVariant.discount : 0,
-          finalPrice: cheapestVariant ? 
+          finalPrice: formatToVND(
+            cheapestVariant ? 
             cheapestVariant.price * (1 - cheapestVariant.discount/100) : null
+          )
         };
       });
 
