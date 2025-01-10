@@ -19,7 +19,8 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-  },    
+    ref: 'Category'
+  },
   manufacturer_id: {
     type: String,
     required: true,

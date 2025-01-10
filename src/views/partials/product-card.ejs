@@ -1,0 +1,19 @@
+<div class="group">
+  <a href="/products/<%= product.id %>" class="block">
+    <div class="bg-gray-100 rounded-lg mb-3 aspect-square overflow-hidden">
+      <img 
+        src="<%= product.image %>" 
+        alt="<%= product.name %>"
+        class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+      >
+    </div>
+    <h3 class="font-medium mb-1.5"><%= product.name %></h3>
+    <div class="flex items-center gap-2">
+      <span class="font-bold"><%= product.finalPrice %></span>
+      <% if (product.discount > 0) { %>
+        <span class="text-sm text-gray-500 line-through"><%= product.originalPrice %></span>
+        <span class="text-sm text-red-500">-<%= product.discount %>%</span>
+      <% } %>
+    </div>
+  </a>
+</div>
