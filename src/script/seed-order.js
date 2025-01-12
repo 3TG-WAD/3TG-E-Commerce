@@ -1,165 +1,122 @@
-const mongoose = require("mongoose");
-const Order = require("../modules/order/models/order");
-const config = require("../config/config");
+const mongoose = require('mongoose');
+const Order = require('../modules/order/models/order');
 
-// Kết nối MongoDB
+// Kết nối database với xử lý lỗi
 mongoose.connect("mongodb://localhost:27017/ecommerce", {
-
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log("Connected to MongoDB successfully");
+}).catch((err) => {
+    console.error("MongoDB connection error:", err);
+    process.exit(1);
 });
+
+const USER_ID = "677f646e4046cae2e98c9e80";
 
 // Dữ liệu mẫu
 const sampleOrders = [
-  {
-    order_id: "OD001",
-    user_id: "677f646e4046cae2e98c9e80", // Thay bằng user_id thực tế
-    shop_id: "SP001",
-    items: [
-      {
-        product_id: "P001",
-        variant_id: "V001",
-        product_name: "Áo thun nam cổ tròn",
-        product_image:
-          "https://down-vn.img.susercontent.com/file/sg-11134201-7qvdr-lf8f4h0n77o153",
-        variant: "Màu trắng - Size M",
-        quantity: 2,
-        price: 150000,
-        discount: 20000,
-      },
-    ],
-    status: "pending",
-    total_amount: 260000,
-    shipping_address: "123 Đường ABC, Quận 1, TP.HCM",
-    payment_method: "COD",
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    order_id: "OD002",
-    user_id: "677f646e4046cae2e98c9e80", // Thay bằng user_id thực tế
-    shop_id: "SP002",
-    items: [
-      {
-        product_id: "P002",
-        variant_id: "V002",
-        product_name: "Quần jean nam ống suông",
-        product_image:
-          "https://down-vn.img.susercontent.com/file/vn-11134207-7qukw-lf8q5rpvp6o9f5",
-        variant: "Màu xanh đậm - Size 32",
-        quantity: 1,
-        price: 450000,
-        discount: 50000,
-      },
-    ],
-    status: "processing",
-    total_amount: 400000,
-    shipping_address: "456 Đường XYZ, Quận 2, TP.HCM",
-    payment_method: "Banking",
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    order_id: "OD003",
-    user_id: "677f646e4046cae2e98c9e80", // Thay bằng user_id thực tế
-    shop_id: "SP003",
-    items: [
-      {
-        product_id: "P003",
-        variant_id: "V003",
-        product_name: "Giày thể thao nam",
-        product_image:
-          "https://down-vn.img.susercontent.com/file/vn-11134207-7qukw-lf8q5rpvykqe43",
-        variant: "Màu đen - Size 42",
-        quantity: 1,
-        price: 850000,
-        discount: 150000,
-      },
-    ],
-    status: "completed",
-    total_amount: 700000,
-    shipping_address: "789 Đường DEF, Quận 3, TP.HCM",
-    payment_method: "Banking",
-    created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 ngày trước
-    updated_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 ngày trước
-  },
-  {
-    order_id: "OD004",
-    user_id: "677f646e4046cae2e98c9e80", // Thay bằng user_id thực tế
-    shop_id: "SP001",
-    items: [
-      {
-        product_id: "P004",
-        variant_id: "V004",
-        product_name: "Áo khoác dù nam",
-        product_image:
-          "https://down-vn.img.susercontent.com/file/vn-11134207-7qukw-lf8q5rpw1c7s6f",
-        variant: "Màu đen - Size L",
-        quantity: 1,
-        price: 320000,
-        discount: 20000,
-      },
-      {
-        product_id: "P005",
-        variant_id: "V005",
-        product_name: "Áo thun nam cổ trụ",
-        product_image:
-          "https://down-vn.img.susercontent.com/file/vn-11134207-7qukw-lf8q5rpw4kh501",
-        variant: "Màu xám - Size L",
-        quantity: 2,
-        price: 180000,
-        discount: 30000,
-      },
-    ],
-    status: "cancelled",
-    total_amount: 630000,
-    shipping_address: "321 Đường GHI, Quận 4, TP.HCM",
-    payment_method: "COD",
-    created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 ngày trước
-    updated_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 ngày trước
-  },
-  {
-    order_id: "OD005",
-    user_id: "677f646e4046cae2e98c9e80", // Thay bằng user_id thực tế
-    shop_id: "SP002",
-    items: [
-      {
-        product_id: "P006",
-        variant_id: "V006",
-        product_name: "Quần short nam",
-        product_image:
-          "https://down-vn.img.susercontent.com/file/vn-11134207-7qukw-lf8q5rpw7p5u01",
-        variant: "Màu be - Size M",
-        quantity: 2,
-        price: 220000,
-        discount: 40000,
-      },
-    ],
-    status: "shipping",
-    total_amount: 400000,
-    shipping_address: "654 Đường JKL, Quận 5, TP.HCM",
-    payment_method: "Banking",
-    created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 ngày trước
-    updated_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 ngày trước
-  },
+    {
+        order_id: "OD001",
+        user_id: new mongoose.Types.ObjectId(USER_ID),
+        shop_id: "SP001",
+        items: [
+            {
+                product_id: "NK-AM-270-001",
+                variant_id: "NK-001-BLK",
+                product_name: "Nike Air Max 270",
+                product_image: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/gorfwjchoasrrzr1fggt/AIR+MAX+270.png",
+                color: "Black/Anthracite",
+                size: "US 8",
+                quantity: 1,
+                price: 159.99 * 23000,
+                discount: 15 * 23000
+            }
+        ],
+        shipping_address: "123 Nguyễn Du, Q.1, TP.HCM",
+        payment_method: "COD",
+        status: "completed",
+        total_amount: (159.99 * 23000) - (15 * 23000),
+        created_at: "2024-03-15T08:00:00Z"
+    },
+    {
+        order_id: "OD002",
+        user_id: new mongoose.Types.ObjectId(USER_ID), 
+        shop_id: "SP002",
+        items: [
+            {
+                product_id: "AD-ULTRABOOST-002",
+                variant_id: "AD-003-BLU",
+                product_name: "Adidas Ultraboost",
+                product_image: "https://assets.adidas.com/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/53a3ca19c06b4c5abc39131398fae837_9366/Giay_Ultraboost_5x_DJen_JI1334_HM3_hover.jpg",
+                color: "Navy Blue",
+                size: "US 9",
+                quantity: 1,
+                price: 179.99 * 23000,
+                discount: 12 * 23000
+            },
+            {
+                product_id: "ADIDAS-SHORTS-007",
+                variant_id: "AD-014-SLV",
+                product_name: "Adidas Performance Shorts",
+                product_image: "https://assets.adidas.com/images/w_766,h_766,f_auto,q_auto,fl_lossy,c_fill,g_auto/2a24b1757281413f879146126ea55968_9366/gym-training-2-in-1-shorts.jpg",
+                color: "Silver Grey",
+                size: "L",
+                quantity: 2,
+                price: 189.50 * 23000,
+                discount: 25 * 23000
+            }
+        ],
+        shipping_address: "456 Lê Lợi, Q.3, TP.HCM",
+        payment_method: "Credit Card",
+        status: "shipping",
+        total_amount: ((179.99 + (189.50 * 2)) * 23000) - ((12 + (25 * 2)) * 23000),
+        created_at: "2024-03-16T10:30:00Z"
+    },
+    {
+        order_id: "OD003",
+        user_id: new mongoose.Types.ObjectId(USER_ID),
+        shop_id: "SP003",
+        items: [
+            {
+                product_id: "PUMA-RS-X-003",
+                variant_id: "PU-004-GRN",
+                product_name: "Puma RS-X",
+                product_image: "https://authentic-shoes.com/wp-content/uploads/2023/04/369818_08.png_c0d906b4dd0c4ab6a4ca8e3c59fa0256.png",
+                color: "Vibrant Green",
+                size: "US 8.5",
+                quantity: 1,
+                price: 139.99 * 23000,
+                discount: 18 * 23000
+            }
+        ],
+        shipping_address: "789 Võ Văn Tần, Q.3, TP.HCM",
+        payment_method: "Momo",
+        status: "pending",
+        total_amount: (139.99 * 23000) - (18 * 23000),
+        created_at: "2024-03-17T14:15:00Z"
+    }
 ];
 
-// Hàm insert dữ liệu
-async function seedOrders() {
-  try {
-    // Xóa tất cả orders cũ
-    await Order.deleteMany({});
+// Hàm seed data
+const seedOrders = async () => {
+    try {
+        // Xóa dữ liệu cũ
+        await Order.deleteMany({});
+        
+        // Thêm dữ liệu mới
+        const result = await Order.insertMany(sampleOrders);
+        
+        console.log(`Đã thêm thành công ${result.length} đơn hàng mẫu`);
+        
+        // Đóng kết nối
+        mongoose.connection.close();
+    } catch (error) {
+        console.error("Error seeding orders:", error);
+        mongoose.connection.close();
+        process.exit(1);
+    }
+};
 
-    // Insert dữ liệu mẫu
-    const result = await Order.insertMany(sampleOrders);
-
-    console.log(`Đã thêm thành công ${result.length} đơn hàng mẫu`);
-
-    // Đóng kết nối
-    mongoose.connection.close();
-  } catch (error) {
-    console.error("Lỗi khi thêm dữ liệu mẫu:", error);
-    mongoose.connection.close();
-  }
-}
-
-// Chạy script
+// Chạy seed
 seedOrders();
