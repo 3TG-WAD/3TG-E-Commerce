@@ -119,11 +119,16 @@
           </svg>
         </div>
         
-        <!-- Cart -->
-        <a href="#" class="relative p-2 text-gray-600 hover:text-gray-900 transition-colors">
-          <i class="fas fa-shopping-cart text-lg lg:text-xl"></i>
-          <span class="absolute -top-1 -right-1 bg-blue-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">0</span>
-        </a>
+        <!-- Cart Icon with Badge -->
+        <div class="relative">
+            <a href="/cart" class="flex items-center">
+              <i class="fa-solid fa-cart-shopping text-xl"></i>
+                <span id="cartCount" 
+                      class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    0
+                </span>
+            </a>
+        </div>
 
         <!-- User Menu -->
         <% if (isAuthenticated()) { %>

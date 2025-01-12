@@ -17,29 +17,28 @@
               <div class="flex items-center gap-6 pb-6 border-b border-gray-200">
                 <!-- Product Image -->
                 <div class="w-24 h-24 flex-shrink-0">
-                  <img src="<%= item.product.photos[0] %>" 
-                       alt="<%= item.product.product_name %>" 
+                  <img src="<%= item.product.images?.[0] || '/images/placeholder.jpg' %>" 
+                       alt="<%= item.product.name %>" 
                        class="w-full h-full object-cover">
                 </div>
   
                 <!-- Product Details -->
                 <div class="flex-1">
-                  <h3 class="font-medium mb-1"><%= item.product.product_name %></h3>
+                  <h3 class="font-medium mb-1"><%= item.product.name %></h3>
                   <div class="text-sm text-gray-500 space-y-1">
-                    <p>Size: <%= item.size %></p>
-                    <p>Color: <%= item.color %></p>
+                    <p>Size: <%= item.size || 'One Size' %></p>
                   </div>
                 </div>
   
                 <!-- Quantity Controls -->
                 <div class="flex items-center gap-3">
                   <button class="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md"
-                          onclick="updateQuantity('<%= item._id %>', -1)">
+                          onclick="updateQuantity('<%= item.product.id %>', -1)">
                     -
                   </button>
                   <span class="w-8 text-center"><%= item.quantity %></span>
                   <button class="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md"
-                          onclick="updateQuantity('<%= item._id %>', 1)">
+                          onclick="updateQuantity('<%= item.product.id %>', 1)">
                     +
                   </button>
                 </div>
@@ -47,18 +46,18 @@
                 <!-- Price -->
                 <div class="text-right min-w-[100px]">
                   <div class="font-medium">
-                    <%= formatToVND(item.final_price * item.quantity) %>
+                    <%= formatToVND(item.product.finalPrice * item.quantity) %>
                   </div>
-                  <% if (item.discount > 0) { %>
+                  <% if (item.product.discount > 0) { %>
                     <div class="text-sm text-gray-500 line-through">
-                      <%= formatToVND(item.price * item.quantity) %>
+                      <%= formatToVND(item.product.original_price * item.quantity) %>
                     </div>
                   <% } %>
                 </div>
   
                 <!-- Remove Button -->
                 <button class="text-red-500 hover:text-red-600"
-                        onclick="removeItem('<%= item._id %>')">
+                        onclick="removeItem('<%= item.product.id %>')">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                   </svg>
@@ -87,7 +86,7 @@
               <span class="font-medium"><%= formatToVND(cart.total_price) %></span>
             </div>
             
-            <% if (discount) { %>
+            <% if (typeof discount !== 'undefined' && discount > 0) { %>
               <div class="flex justify-between text-red-500">
                 <span>Discount (<%= discount %>%)</span>
                 <span>-<%= formatToVND(cart.total_price * discount / 100) %></span>
@@ -102,7 +101,7 @@
             <div class="border-t border-gray-200 pt-3 flex justify-between">
               <span class="font-medium">Total</span>
               <span class="font-medium">
-                <%= formatToVND(cart.total_price * (1 - discount/100) + 15000) %>
+                <%= formatToVND(cart.total_price * (1 - (discount || 0)/100) + 15000) %>
               </span>
             </div>
           </div>
