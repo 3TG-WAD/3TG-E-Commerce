@@ -52,7 +52,15 @@
             <!-- Size -->
             <div class="mb-6">
                 <h3 class="font-medium mb-2">Size</h3>
-                <div class="text-gray-600" data-product-size><%= product.size %></div>
+                <select id="productSize" 
+                        class="w-32 px-3 py-2 border rounded focus:outline-none focus:border-gray-500"
+                        required>
+                    <option value="">Select Size</option>
+                    <% const sizes = ['S', 'M', 'L', 'XL', 'XXL'] %>
+                    <% sizes.forEach(size => { %>
+                        <option value="<%= size %>"><%= size %></option>
+                    <% }) %>
+                </select>
             </div>
 
             <!-- Add to Cart -->
@@ -149,18 +157,3 @@
         <% } %>
     </div>
 </div>
-
-<!-- Add debug info directly in HTML -->
-<div class="mb-4 p-2 bg-gray-100 rounded">
-    <p>Debug Info:</p>
-    <p>Product ID: <%= JSON.stringify(product) %></p>
-</div>
-
-<!-- Add immediate executing script -->
-<script>
-(function() {
-    console.log('Debug - Product Info:', {
-        product: '<%- JSON.stringify(product) %>'
-    });
-})();
-</script>

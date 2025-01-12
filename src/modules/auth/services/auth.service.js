@@ -42,6 +42,14 @@ class AuthService {
           if (err) return reject(err);
           resolve(user);
         });
+
+        // Lưu user vào session
+        req.session.user = {
+            _id: user._id,
+            email: user.email,
+            username: user.username
+        };
+        console.log('User saved to session:', req.session.user); // Debug log
       })(req, res, next);
     });
   }

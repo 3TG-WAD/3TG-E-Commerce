@@ -1,5 +1,6 @@
 const User = require("../../user/models/user");
 const authService = require("../services/auth.service");
+const { mergeCart } = require('../../../middleware/cart.middleware');
 
 exports.renderLogin = (req, res) => {
   const errorMessage = req.flash("error");
@@ -35,7 +36,18 @@ exports.login = async (req, res, next) => {
     if (req.isAuthenticated() && req.user.authProvider === 'google') {
       return res.redirect('/');
     }
-    await authService.loginUser(req, res, next);
+    
+    // Lưu cart session trước khi login
+    const sessionCart = req.session.cartItems || [];
+    
+    // Login user
+    const user = await authService.loginUser(req, res, next);
+    
+    // Merge cart sau khi login
+    if (sessionCart.length > 0) {
+      await mergeCart(user._id, sessionCart);
+    }
+    
     return res.redirect('/');
   } catch (error) {
     req.flash('error', error.message);

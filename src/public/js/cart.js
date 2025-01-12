@@ -63,7 +63,16 @@ async function addToCart(productId) {
         }
 
         const quantity = parseInt(document.querySelector('#quantity').value || '1');
-        
+        const size = document.querySelector('#productSize')?.value;
+
+        // Validate size
+        if (!size) {
+            showNotification('Please select a size', 'error');
+            return;
+        }
+
+        console.log('Sending cart request:', { productId, quantity, size }); // Debug
+
         const response = await fetch('/cart/add', {
             method: 'POST',
             headers: {
@@ -72,7 +81,7 @@ async function addToCart(productId) {
             body: JSON.stringify({
                 product_id: productId,
                 quantity: quantity,
-                size: document.querySelector('[data-product-size]')?.textContent?.trim() || ''
+                size: size
             })
         });
 
@@ -91,5 +100,9 @@ async function addToCart(productId) {
 }
 
 function showNotification(message, type = 'success') {
-    alert(message);
+    if (type === 'error') {
+        alert('Error: ' + message);
+    } else {
+        alert(message);
+    }
 }
