@@ -9,11 +9,94 @@
 <header class="bg-white border-b border-gray-100 sticky top-0 z-50">
   <div class="container mx-auto px-4">
     <div class="flex justify-between items-center h-16 lg:h-20">
-      <!-- Logo -->
-      <a href="/" class="flex items-center group">
-        <img src="/images/favicon.ico" alt="SixT Store Logo" class="h-8 w-8 lg:h-9 lg:w-9 mr-2 lg:mr-3 group-hover:scale-105 transition-transform">
-        <div class="text-2xl lg:text-3xl font-bold tracking-tight text-gray-900" style="font-family: 'Roboto Slab', sans-serif;">SixT</div>
-      </a>
+      <!-- Left section with Logo and Navigation -->
+      <div class="flex items-center space-x-8">
+        <!-- Logo -->
+        <a href="/" class="flex items-center group">
+          <img src="/images/favicon.ico" alt="SixT Store Logo" class="h-8 w-8 lg:h-9 lg:w-9 mr-2 lg:mr-3 group-hover:scale-105 transition-transform">
+          <div class="text-2xl lg:text-3xl font-bold tracking-tight text-gray-900" style="font-family: 'Roboto Slab', sans-serif;">SixT</div>
+        </a>
+
+        <!-- Main navigation - Desktop -->
+        <nav class="hidden md:flex items-center space-x-8">
+          <div class="relative group" x-data="{ open: false }">
+            <button 
+              @click="open = !open"
+              @click.away="open = false"
+              class="flex items-center text-gray-600 hover:text-gray-900 py-2 transition-colors"
+            >
+              <span class="font-medium">Shop</span>
+              <svg class="w-4 h-4 ml-1.5 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            <!-- Categories Dropdown -->
+            <div 
+              x-show="open"
+              x-transition:enter="transition ease-out duration-100"
+              x-transition:enter-start="opacity-0 scale-95"
+              x-transition:enter-end="opacity-100 scale-100"
+              x-transition:leave="transition ease-in duration-75"
+              x-transition:leave-start="opacity-100 scale-100"
+              x-transition:leave-end="opacity-0 scale-95"
+              class="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-1 border border-gray-100 z-50"
+              style="display: none;"
+            >
+              <% if (locals.categories && categories.length > 0) { %>
+                <% categories.forEach(function(category) { %>
+                  <a 
+                    href="/categories/<%= category.slug %>"
+                    class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    <%= category.category_name %>
+                  </a>
+                <% }); %>
+              <% } %>
+            </div>
+          </div>
+          <a href="/categories/all?sort=price-asc" class="text-gray-600 font-medium hover:text-gray-900 py-2 transition-colors">On Sale</a>
+          <a href="/categories/all?sort=newest" class="text-gray-600 font-medium hover:text-gray-900 py-2 transition-colors">New Arrivals</a>
+          
+          <!-- Brands dropdown -->
+          <div class="relative group" x-data="{ open: false }">
+            <button 
+              @click="open = !open"
+              @click.away="open = false"
+              class="flex items-center text-gray-600 hover:text-gray-900 py-2 transition-colors"
+            >
+              <span class="font-medium">Brands</span>
+              <svg class="w-4 h-4 ml-1.5 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            <!-- Brands Dropdown -->
+            <div 
+              x-show="open"
+              x-transition:enter="transition ease-out duration-100"
+              x-transition:enter-start="opacity-0 scale-95"
+              x-transition:enter-end="opacity-100 scale-100"
+              x-transition:leave="transition ease-in duration-75"
+              x-transition:leave-start="opacity-100 scale-100"
+              x-transition:leave-end="opacity-0 scale-95"
+              class="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-1 border border-gray-100 z-50"
+              style="display: none;"
+            >
+              <% if (locals.manufacturers && manufacturers.length > 0) { %>
+                <% manufacturers.forEach(function(brand) { %>
+                  <a 
+                    href="/categories/all?manufacturer=<%= brand.manufacturer_id %>"
+                    class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    <%= brand.name %>
+                  </a>
+                <% }); %>
+              <% } %>
+            </div>
+          </div>
+        </nav>
+      </div>
 
       <!-- Mobile menu button -->
       <button class="md:hidden p-2 text-gray-600" id="mobileMenuBtn">
@@ -22,87 +105,7 @@
         </svg>
       </button>
 
-      <!-- Main navigation - Desktop -->
-      <nav class="hidden md:flex items-center space-x-8">
-        <div class="relative group" x-data="{ open: false }">
-          <button 
-            @click="open = !open"
-            @click.away="open = false"
-            class="flex items-center text-gray-600 hover:text-gray-900 py-2 transition-colors"
-          >
-            <span class="font-medium">Shop</span>
-            <svg class="w-4 h-4 ml-1.5 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-
-          <!-- Categories Dropdown -->
-          <div 
-            x-show="open"
-            x-transition:enter="transition ease-out duration-100"
-            x-transition:enter-start="opacity-0 scale-95"
-            x-transition:enter-end="opacity-100 scale-100"
-            x-transition:leave="transition ease-in duration-75"
-            x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-95"
-            class="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-1 border border-gray-100 z-50"
-            style="display: none;"
-          >
-            <% if (locals.categories && categories.length > 0) { %>
-              <% categories.forEach(function(category) { %>
-                <a 
-                  href="/categories/<%= category.slug %>"
-                  class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
-                >
-                  <%= category.category_name %>
-                </a>
-              <% }); %>
-            <% } %>
-          </div>
-        </div>
-        <a href="/categories/all?sort=price-asc" class="text-gray-600 font-medium hover:text-gray-900 py-2 transition-colors">On Sale</a>
-        <a href="/categories/all?sort=newest" class="text-gray-600 font-medium hover:text-gray-900 py-2 transition-colors">New Arrivals</a>
-        
-        <!-- Updated Brands dropdown -->
-        <div class="relative group" x-data="{ open: false }">
-          <button 
-            @click="open = !open"
-            @click.away="open = false"
-            class="flex items-center text-gray-600 hover:text-gray-900 py-2 transition-colors"
-          >
-            <span class="font-medium">Brands</span>
-            <svg class="w-4 h-4 ml-1.5 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-
-          <!-- Brands Dropdown -->
-          <div 
-            x-show="open"
-            x-transition:enter="transition ease-out duration-100"
-            x-transition:enter-start="opacity-0 scale-95"
-            x-transition:enter-end="opacity-100 scale-100"
-            x-transition:leave="transition ease-in duration-75"
-            x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-95"
-            class="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-1 border border-gray-100 z-50"
-            style="display: none;"
-          >
-            <% if (locals.manufacturers && manufacturers.length > 0) { %>
-              <% manufacturers.forEach(function(brand) { %>
-                <a 
-                  href="/categories/all?manufacturer=<%= brand.manufacturer_id %>"
-                  class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
-                >
-                  <%= brand.name %>
-                </a>
-              <% }); %>
-            <% } %>
-          </div>
-        </div>
-      </nav>
-
-      <!-- Search and icons -->
+      <!-- Right section with Search and Icons -->
       <div class="flex items-center">
         <!-- Search - Hidden on mobile -->
         <div class="relative hidden md:block mr-6">
