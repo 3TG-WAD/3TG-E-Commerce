@@ -146,6 +146,96 @@ class ProductFilterService {
             currency: 'VND'
         }).format(price);
     }
+
+    handleSort() {
+        const sortSelect = document.getElementById('sortBy');
+        if (!sortSelect) return;
+
+        sortSelect.addEventListener('change', async () => {
+            const categoryId = window.location.pathname.split('/').pop();
+            const sortValue = sortSelect.value;
+
+            try {
+                const response = await fetch(`/categories/${categoryId}/sort?sort=${sortValue}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('productsGrid').innerHTML = data.html;
+                } else {
+                    console.error('Error sorting products:', data.message);
+                }
+            } catch (error) {
+                console.error('Error sorting products:', error);
+            }
+        });
+    }
+
+    async handleSort(event) {
+        const sortValue = event.target.value;
+        const categoryId = window.location.pathname.split('/').pop();
+
+        console.log('Handling sort:', { sortValue, categoryId }); // Debug log
+
+        try {
+            const response = await fetch(`/api/categories/${categoryId}/sort?sort=${sortValue}`);
+            const data = await response.json();
+
+            console.log('Sort response:', data); // Debug log
+
+            if (data.success) {
+                // Cập nhật URL mà không reload trang
+                const url = new URL(window.location);
+                url.searchParams.set('sort', sortValue);
+                window.history.pushState({}, '', url);
+
+                // Render sản phẩm mới
+                this.renderProducts(data.products);
+            } else {
+                console.error('Sort error:', data.message);
+            }
+        } catch (error) {
+            console.error('Sort error:', error);
+        }
+    }
+
+    renderProducts(products) {
+        console.log('Rendering products:', products); // Debug log
+
+        if (!this.productsGrid || !products) {
+            console.error('Missing productsGrid or products data');
+            return;
+        }
+
+        const html = products.map(product => {
+            console.log('Processing product:', product); // Debug log per product
+            return `
+                <div class="group">
+                    <a href="/products/${product.id}" class="block">
+                        <div class="bg-gray-100 rounded-lg mb-3 aspect-square overflow-hidden">
+                            <img src="${product.image}" 
+                                 alt="${product.name}"
+                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        </div>
+                        <h3 class="font-medium mb-1.5">${product.name}</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold">
+                                ${this.formatPrice(product.finalPrice)}
+                            </span>
+                            ${product.discount > 0 ? `
+                                <span class="text-sm text-gray-500 line-through">
+                                    ${this.formatPrice(product.price)}
+                                </span>
+                                <span class="text-sm text-red-500">-${product.discount}%</span>
+                            ` : ''}
+                        </div>
+                    </a>
+                </div>
+            `;
+        }).join('');
+
+        console.log('Generated HTML:', html.substring(0, 200) + '...'); // Debug log HTML
+        this.productsGrid.innerHTML = html;
+    }
 }
 
 // Khởi tạo service khi document ready

@@ -162,7 +162,13 @@
 </div>
 
 <script type="module">
-  import ProductFilterService from '../../modules/product/services/filter.service.js';
+    console.log('Loading filter service...'); // Debug script loading
+    import ProductFilterService from '../../modules/product/services/filter.service.js';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOM loaded, initializing service...'); // Debug DOM loaded
+        new ProductFilterService();
+    });
 </script>
 
 <script>
