@@ -10,5 +10,5 @@ router.get('/purchase', isAuthenticated, orderController.getPurchasePage);
 router.get('/api/orders', isAuthenticated, orderController.getOrders);
 router.get('/api/orders/search', isAuthenticated, orderController.searchOrders);
 router.post('/api/orders/:orderId/status', isAuthenticated, orderController.updateOrderStatus);
-
+router.get('/purchase/:orderId', orderController.getOrderDetails);
 module.exports = router;
