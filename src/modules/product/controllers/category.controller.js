@@ -29,14 +29,25 @@ const categoryController = {
                 manufacturer: req.query.manufacturer 
             });
 
-            const category = await Category.findOne({ slug });
-            if (!category) {
-                return res.status(404).render('error/404', {
-                    title: '404 - Page Not Found'
-                });
+            // Thêm xử lý đặc biệt cho route "all"
+            let category;
+            if (slug === 'all') {
+                category = {
+                    category_id: 'all',
+                    category_name: 'All Products',
+                    slug: 'all'
+                };
+            } else {
+                category = await Category.findOne({ slug });
+                if (!category) {
+                    return res.status(404).render('error/404', {
+                        title: '404 - Page Not Found'
+                    });
+                }
             }
 
             const manufacturers = await Manufacturer.find({});
+            const categories = await Category.find({});
             const currentSort = req.query.sort || 'popular';
             
             // Xử lý manufacturers filter
@@ -44,10 +55,8 @@ const categoryController = {
                 req.query.manufacturer : 
                 req.query.manufacturer ? [req.query.manufacturer] : [];
 
-            console.log('Selected manufacturers:', selectedManufacturers);
-
-            // 1. Lấy sản phẩm với filter manufacturers
-            const baseQuery = { category_id: category.category_id };
+            // Điều chỉnh query dựa trên việc có phải "all" hay không
+            const baseQuery = slug === 'all' ? {} : { category_id: category.category_id };
             if (selectedManufacturers.length > 0) {
                 baseQuery.manufacturer_id = { $in: selectedManufacturers };
             }
@@ -116,6 +125,7 @@ const categoryController = {
             res.render('category/index', {
                 title: `${category.category_name} - SixT Store`,
                 category,
+                categories,
                 products: formattedProducts,
                 manufacturers,
                 filters: {
@@ -409,7 +419,7 @@ const categoryController = {
             console.error('Category error:', error);
             res.status(500).render('500');
         }
-    }
+    },
 };
 
 module.exports = categoryController;

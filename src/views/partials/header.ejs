@@ -60,9 +60,46 @@
             <% } %>
           </div>
         </div>
-        <a href="#" class="text-gray-600 font-medium hover:text-gray-900 py-2 transition-colors">On Sale</a>
-        <a href="#" class="text-gray-600 font-medium hover:text-gray-900 py-2 transition-colors">New Arrivals</a>
-        <a href="#" class="text-gray-600 font-medium hover:text-gray-900 py-2 transition-colors">Brands</a>
+        <a href="/categories/all?sort=price-asc" class="text-gray-600 font-medium hover:text-gray-900 py-2 transition-colors">On Sale</a>
+        <a href="/categories/all?sort=newest" class="text-gray-600 font-medium hover:text-gray-900 py-2 transition-colors">New Arrivals</a>
+        
+        <!-- Updated Brands dropdown -->
+        <div class="relative group" x-data="{ open: false }">
+          <button 
+            @click="open = !open"
+            @click.away="open = false"
+            class="flex items-center text-gray-600 hover:text-gray-900 py-2 transition-colors"
+          >
+            <span class="font-medium">Brands</span>
+            <svg class="w-4 h-4 ml-1.5 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <!-- Brands Dropdown -->
+          <div 
+            x-show="open"
+            x-transition:enter="transition ease-out duration-100"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-95"
+            class="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-1 border border-gray-100 z-50"
+            style="display: none;"
+          >
+            <% if (locals.manufacturers && manufacturers.length > 0) { %>
+              <% manufacturers.forEach(function(brand) { %>
+                <a 
+                  href="/categories/all?manufacturer=<%= brand.manufacturer_id %>"
+                  class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                >
+                  <%= brand.name %>
+                </a>
+              <% }); %>
+            <% } %>
+          </div>
+        </div>
       </nav>
 
       <!-- Search and icons -->
@@ -171,9 +208,28 @@
             </div>
           </div>
           
-          <a href="#" class="block px-4 py-3 text-gray-600 hover:bg-gray-50">On Sale</a>
-          <a href="#" class="block px-4 py-3 text-gray-600 hover:bg-gray-50">New Arrivals</a>
-          <a href="#" class="block px-4 py-3 text-gray-600 hover:bg-gray-50">Brands</a>
+          <a href="/categories/all?sort=price-asc" class="block px-4 py-3 text-gray-600 hover:bg-gray-50">On Sale</a>
+          <a href="/categories/all?sort=newest" class="block px-4 py-3 text-gray-600 hover:bg-gray-50">New Arrivals</a>
+          
+          <!-- Mobile Brands Dropdown -->
+          <div class="px-4 py-3">
+            <button class="flex items-center justify-between w-full text-gray-600" id="mobileBrandsBtn">
+              <span class="font-medium">Brands</span>
+              <svg class="w-4 h-4 transform transition-transform" id="mobileBrandsIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+            <div class="hidden mt-2 space-y-2 pl-4" id="mobileBrandsMenu">
+              <% if (locals.manufacturers && manufacturers.length > 0) { %>
+                <% manufacturers.forEach(function(brand) { %>
+                  <a href="/categories/all?manufacturer=<%= brand.manufacturer_id %>" class="block py-2 text-sm text-gray-600">
+                    <%= brand.name %>
+                  </a>
+                <% }); %>
+              <% } %>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -197,5 +253,15 @@
   mobileShopBtn.addEventListener('click', () => {
     mobileCategoriesMenu.classList.toggle('hidden');
     mobileShopIcon.classList.toggle('rotate-180');
+  });
+
+  // Add brands mobile menu toggle
+  const mobileBrandsBtn = document.getElementById('mobileBrandsBtn');
+  const mobileBrandsMenu = document.getElementById('mobileBrandsMenu');
+  const mobileBrandsIcon = document.getElementById('mobileBrandsIcon');
+
+  mobileBrandsBtn.addEventListener('click', () => {
+    mobileBrandsMenu.classList.toggle('hidden');
+    mobileBrandsIcon.classList.toggle('rotate-180');
   });
 </script>
