@@ -103,6 +103,9 @@ const configureExpress = (app) => {
   const orderRoutes = require('../modules/order/routes/order.routes');
   const profileRoutes = require('../modules/user/routes/profile.routes');
   const categoryRoutes = require('../modules/product/routes/category.routes');
+  const productRoutes = require('../modules/product/routes/product.routes');
+
+  app.use('/', productRoutes);
   app.use('/', categoryRoutes);
   app.use('/', profileRoutes);
   app.use('/', landingRoutes);
