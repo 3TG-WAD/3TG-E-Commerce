@@ -1,71 +1,97 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - WriteAce</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="/css/stylesheet.css">
 </head>
-<body class="bg-gray-100">
+<body class="min-h-screen bg-gray-50/50">
     <div class="container mx-auto px-4 py-8">
         <div class="max-w-3xl mx-auto">
-            <div class="bg-white rounded-lg shadow p-6">
-                <!-- Header Section with Avatar -->
-                <div class="flex items-center space-x-4 mb-8 border-b pb-6">
-                    <div class="relative">
-                        <img src="<%= user.avatar %>" 
-                             alt="Profile Picture" 
-                             class="w-16 h-16 rounded-full object-cover">
-                        <button id="changeAvatarBtn" 
-                                class="absolute bottom-0 right-0 bg-blue-500 text-white p-1 rounded-full hover:bg-blue-600 w-6 h-6 flex items-center justify-center hidden">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                            </svg>
+            <!-- Profile Card -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <!-- Header Section -->
+                <div class="p-6 sm:p-8 border-b border-gray-200">
+                    <div class="flex flex-col sm:flex-row items-center gap-2">
+                        <!-- Avatar Section -->
+                        <div class="relative group">
+                            <div class="w-16 h-16 rounded-full overflow-hidden ring-1 ring-gray-200">
+                                <img src="<%= user.avatar %>" 
+                                     alt="Profile Picture" 
+                                     class="w-full h-full object-cover rounded-full">
+                            </div>
+                            <!-- Edit Avatar Button (Hidden by default) -->
+                            <button type="button"
+                                    id="changeAvatarBtn"
+                                    class="hidden absolute inset-0 w-full h-full bg-black/50 rounded-full flex items-center justify-center text-white text-sm font-medium hover:bg-black/60 transition-all">
+                                <i class="fas fa-camera mr-1"></i>
+                                Change
+                            </button>
+                            <!-- Disabled State Message -->
+                            <div class="edit-hint absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 whitespace-nowrap opacity-0 transition-opacity">
+                                Click Edit to change avatar
+                            </div>
+                        </div>
+
+                        <!-- User Info -->
+                        <div class="text-center sm:text-left flex-1">
+                            <h2 class="text-2xl font-bold text-gray-900"><%= user.username %></h2>
+                            <p class="text-gray-500"><%= user.email %></p>
+                        </div>
+
+                        <!-- Edit Button -->
+                        <button type="button" 
+                                id="editProfileBtn"
+                                class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                            <i class="fas fa-edit mr-2"></i>
+                            Edit Profile
                         </button>
                     </div>
-                    <div>
-                        <h2 class="text-xl font-semibold"><%= user.username %></h2>
-                        <p class="text-gray-500"><%= user.email %></p>
-                    </div>
-                    <button type="button" 
-                            id="editProfileBtn"
-                            class="ml-auto bg-blue-500 text-blue-500 px-4 py-2 rounded-md hover:bg-blue-600 text-sm">
-                        Edit
-                    </button>
                 </div>
 
                 <!-- Profile Form -->
-                <form id="profileForm" action="/profile/update" method="POST" class="space-y-6">
-                    <div class="grid grid-cols-2 gap-4">
-                        <!-- Full Name -->
-                        <div class="col-span-2 sm:col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                            <input type="text" name="username" value="<%= user.username %>" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                <form id="profileForm" class="p-6 sm:p-8 space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <!-- Form fields with disabled state message -->
+                        <div class="space-y-2 relative group">
+                            <label class="block text-sm font-medium text-gray-700">Full Name</label>
+                            <input type="text" 
+                                   name="username" 
+                                   value="<%= user.username %>"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
                                    disabled>
+                            <div class="edit-hint absolute -top-1 right-0 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                Click Edit to modify
+                            </div>
                         </div>
 
                         <!-- Phone -->
-                        <div class="col-span-2 sm:col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                            <input type="tel" name="phone" value="<%= user.phone || '' %>" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Phone Number</label>
+                            <input type="tel" 
+                                   name="phone" 
+                                   value="<%= user.phone || '' %>"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
                                    disabled>
                         </div>
 
                         <!-- Email -->
-                        <div class="col-span-2 sm:col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                            <input type="email" name="email" value="<%= user.email %>" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" 
+                                   name="email" 
+                                   value="<%= user.email %>"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
                                    disabled>
                         </div>
 
                         <!-- Gender -->
-                        <div class="col-span-2 sm:col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Gender</label>
                             <select name="gender" 
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
                                     disabled>
                                 <option value="male" <%= user.gender === 'male' ? 'selected' : '' %>>Male</option>
                                 <option value="female" <%= user.gender === 'female' ? 'selected' : '' %>>Female</option>
@@ -74,32 +100,70 @@
                         </div>
 
                         <!-- Address -->
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                            <textarea name="address" rows="2" 
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                      disabled><%= user.address || '' %></textarea>
+                        <div class="col-span-full space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Address</label>
+                            <textarea name="address" 
+                                     rows="3"
+                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 resize-none"
+                                     disabled><%= user.address || '' %></textarea>
                         </div>
                     </div>
 
-                    <!-- Submit Button -->
-                    <div class="flex justify-end pt-4 hidden" id="saveButtons">
-                        <button type="button" 
-                                id="cancelBtn"
-                                class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 text-sm mr-2">
-                            Cancel
-                        </button>
-                        <button type="submit" 
-                                class="bg-blue-500 text-blue-600 px-4 py-2 rounded-md hover:bg-blue-600 text-sm">
-                            Save Changes
-                        </button>
+                    <!-- Action Buttons -->
+                    <div id="saveButtons" class="hidden pt-6 border-t border-gray-200">
+                        <div class="flex justify-end gap-4">
+                            <button type="button" 
+                                    id="cancelBtn"
+                                    class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 text-sm font-medium text-blue-500 bg-blue-500 rounded-lg hover:bg-blue-600">
+                                Save Changes
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+    <input type="file" id="avatarInput" accept="image/*" class="hidden">
+    
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="/js/profile.js"></script>
+
+    <style>
+        /* Custom styles for disabled state */
+        .edit-hint {
+            transition: opacity 0.2s;
+        }
+        
+        .form-field-wrapper:hover .edit-hint {
+            opacity: 1;
+        }
+        
+        input[disabled], select[disabled], textarea[disabled] {
+            cursor: not-allowed;
+        }
+        
+        .group:hover .edit-hint {
+            opacity: 1;
+        }
+        
+        /* Custom styles for avatar hover */
+        .group:hover #changeAvatarBtn.hidden:not(.edit-mode) {
+            display: none !important;
+        }
+        
+        #changeAvatarBtn.edit-mode {
+            display: flex !important;
+        }
+        
+        .group:hover .edit-hint {
+            opacity: 1;
+        }
+    </style>
 </body>
 </html>

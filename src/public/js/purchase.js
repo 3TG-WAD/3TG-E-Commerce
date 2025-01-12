@@ -237,8 +237,12 @@ const loadOrders = async (status = 'all') => {
                 <div class="p-6 border-b border-gray-100">
                     <div class="flex justify-between items-center">
                         <div>
-                            <h3 class="text-lg font-semibold text-gray-900">Order #${order.order_id}</h3>
-                            <p class="text-sm text-gray-500 mt-1">${formatDate(order.created_at)}</p>
+                            <a href="/purchase/${order.order_id}" class="group">
+                                <h3 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                                    Order #${order.order_id}
+                                </h3>
+                                <p class="text-sm text-gray-500 mt-1">${formatDate(order.created_at)}</p>
+                            </a>
                         </div>
                         <div class="flex items-center gap-4">
                             <span class="px-4 py-2 rounded-full text-sm font-medium ${getStatusStyle(order.status)}">
@@ -333,51 +337,57 @@ const updateOrdersDisplay = (orders) => {
 
 const renderOrder = (order) => {
     return `
-        <div class="p-6 border-b border-gray-100">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Order #${order.order_id}</h3>
-                    <p class="text-sm text-gray-500 mt-1">${formatDate(order.created_at)}</p>
+        <div class="bg-white rounded-xl shadow-sm mb-6 overflow-hidden hover:shadow-md transition-shadow">
+            <div class="p-6 border-b border-gray-100">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <a href="/purchase/${order.order_id}" class="group">
+                            <h3 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                                Order #${order.order_id}
+                            </h3>
+                            <p class="text-sm text-gray-500 mt-1">${formatDate(order.created_at)}</p>
+                        </a>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="px-4 py-2 rounded-full text-sm font-medium ${getStatusStyle(order.status)}">
+                            ${getStatusText(order.status)}
+                        </span>
+                    </div>
                 </div>
-                <div class="flex items-center gap-4">
-                    <span class="px-4 py-2 rounded-full text-sm font-medium ${getStatusStyle(order.status)}">
-                        ${getStatusText(order.status)}
-                    </span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="p-6">
-            <div class="space-y-2">
-                ${renderOrderItems(order.items)}
             </div>
             
-            <div class="mt-6 pt-6 border-t border-gray-100">
-                <div class="flex flex-col gap-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-600">Total Amount</span>
-                        <span class="text-xl font-semibold text-gray-900">${formatCurrency(order.total_amount)}</span>
-                    </div>
-                    <div class="flex justify-between items-center text-sm text-gray-500">
-                        <span>Payment Method</span>
-                        <span class="font-medium">${order.payment_method}</span>
-                    </div>
-                    <div class="flex justify-between items-center text-sm text-gray-500">
-                        <span>Shipping Address</span>
-                        <span class="font-medium">${order.shipping_address}</span>
-                    </div>
+            <div class="p-6">
+                <div class="space-y-2">
+                    ${renderOrderItems(order.items)}
                 </div>
                 
-                ${order.status === 'pending' ? `
-                    <div class="mt-6 flex justify-end gap-3">
-                        <button class="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 transition-colors">
-                            Cancel Order
-                        </button>
-                        <button class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
-                            Track Order
-                        </button>
+                <div class="mt-6 pt-6 border-t border-gray-100">
+                    <div class="flex flex-col gap-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Total Amount</span>
+                            <span class="text-xl font-semibold text-gray-900">${formatCurrency(order.total_amount)}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm text-gray-500">
+                            <span>Payment Method</span>
+                            <span class="font-medium">${order.payment_method}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm text-gray-500">
+                            <span>Shipping Address</span>
+                            <span class="font-medium">${order.shipping_address}</span>
+                        </div>
                     </div>
-                ` : ''}
+                    
+                    ${order.status === 'pending' ? `
+                        <div class="mt-6 flex justify-end gap-3">
+                            <button class="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 transition-colors">
+                                Cancel Order
+                            </button>
+                            <button class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
+                                Track Order
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
             </div>
         </div>
     `;
