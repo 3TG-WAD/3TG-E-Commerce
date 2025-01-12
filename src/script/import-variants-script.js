@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
-const Variant = require('../app/models/variant');
+const Variant = require('../modules/product/models/variant');
 
 // MongoDB connection string
 const MONGODB_URI = 'mongodb://localhost:27017/ecommerce';
@@ -13,7 +13,7 @@ async function importVariants() {
         console.log('Connected to MongoDB');
 
         // Read JSON file
-        const jsonPath = path.join(__dirname, '../variantsdata.json');
+        const jsonPath = path.join(__dirname, '../../variantsdata.json');
         const variantsData = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
 
         // Clear existing variants (optional)

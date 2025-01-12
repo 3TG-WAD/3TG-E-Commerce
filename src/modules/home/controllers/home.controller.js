@@ -1,4 +1,5 @@
-const productService = require('../../product/services/product.service');
+const ProductService = require('../../product/services/product.service');
+const productService = new ProductService();
 
 exports.getHomePage = async (req, res) => {
     try {
