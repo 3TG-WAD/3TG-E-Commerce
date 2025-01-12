@@ -35,37 +35,39 @@ const getProductDetail = async (req, res) => {
             return currFinalPrice < minFinalPrice ? curr : min;
         }, null);
 
-        cheapestVariant.price = cheapestVariant.price * 1000;
-
-        // Tính toán giá
-        const originalPrice = cheapestVariant?.price || 0;
+        // Tính toán giá (giữ nguyên cách tính cũ)
+        const originalPrice = (cheapestVariant?.price || 0) * 1000;
         const discount = cheapestVariant?.discount || 0;
         const finalPrice = originalPrice * (1 - discount / 100);
 
-        // 4. Get reviews with pagination
-        const page = parseInt(req.query.review_page) || 1;
-        const limit = 5;
-        const skip = (page - 1) * limit;
+        // 4. Get reviews với phân trang đúng
+        const reviewPage = parseInt(req.query.review_page) || 1;
+        const reviewLimit = 3;
+        const reviewSkip = (reviewPage - 1) * reviewLimit;
 
         const [reviews, totalReviews] = await Promise.all([
             Review.aggregate([
                 { $match: { product_id: productId } },
                 { $sort: { created_at: -1 } },
-                { $skip: skip },
-                { $limit: limit },
+                { $skip: reviewSkip },
+                { $limit: reviewLimit },
                 {
                     $project: {
                         rating: 1,
                         comment: 1,
                         created_at: 1,
-                        user_name: "Anonymous User" // Tạm thời để anonymous
+                        user_name: "Anonymous User"
                     }
                 }
             ]),
             Review.countDocuments({ product_id: productId })
         ]);
 
-        // 5. Get recommended products
+        // 5. Get recommended products với phân trang riêng
+        const recommendPage = parseInt(req.query.page) || 1;
+        const recommendLimit = 4;
+        const recommendSkip = (recommendPage - 1) * recommendLimit;
+
         const recommendedProducts = await Product.aggregate([
             {
                 $match: {
@@ -90,7 +92,7 @@ const getProductDetail = async (req, res) => {
                                 as: "variant",
                                 in: {
                                     $multiply: [
-                                        "$$variant.price",
+                                        { $multiply: ["$$variant.price", 1000] },
                                         { $subtract: [1, { $divide: ["$$variant.discount", 100] }] }
                                     ]
                                 }
@@ -104,13 +106,19 @@ const getProductDetail = async (req, res) => {
                     product_id: 1,
                     product_name: 1,
                     photos: 1,
-                    price: "$cheapestPrice",
-                    original_price: { $min: "$variants.price" },
+                    price: { $multiply: [{ $min: "$variants.price" }, 1000] },
+                    original_price: { $multiply: [{ $min: "$variants.price" }, 1000] },
                     discount: { $max: "$variants.discount" }
                 }
             },
-            { $limit: 4 }
+            { $skip: recommendSkip },
+            { $limit: recommendLimit }
         ]);
+
+        const totalRecommended = await Product.countDocuments({
+            category_id: product.category_id,
+            product_id: { $ne: productId }
+        });
 
         // 6. Render view
         res.render('product/index', {
@@ -136,17 +144,18 @@ const getProductDetail = async (req, res) => {
             },
             reviews: {
                 items: reviews,
-                currentPage: page,
-                totalPages: Math.ceil(totalReviews / limit),
+                currentPage: reviewPage,
+                totalPages: Math.ceil(totalReviews / reviewLimit),
                 totalReviews
             },
             recommended: {
                 items: recommendedProducts.map(item => ({
                     ...item,
                     finalPrice: item.price
-                }))
+                })),
+                currentPage: recommendPage,
+                totalPages: Math.ceil(totalRecommended / recommendLimit)
             },
-
             user: req.user || null,
             formatToVND: (price) => {
                 return new Intl.NumberFormat('vi-VN', {

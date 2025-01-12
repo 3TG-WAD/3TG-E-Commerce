@@ -84,14 +84,10 @@
     </div>
 
     <!-- Reviews Section -->
-    <div class="mt-16">
+    <div class="mt-16" id="reviews">
         <div class="flex items-center justify-between mb-8">
             <h2 class="text-2xl font-bold">Reviews (<%= reviews.totalReviews %>)</h2>
             <div class="flex items-center gap-4">
-                <button class="px-4 py-2 border rounded hover:bg-gray-50">
-                    <i class="fas fa-sort"></i>
-                    Latest
-                </button>
                 <% if (user) { %>
                     <button class="px-4 py-2 bg-black text-white rounded hover:bg-gray-800">
                         Write a Review
@@ -101,57 +97,48 @@
         </div>
 
         <!-- Reviews List -->
-        <div class="space-y-8">
-            <% reviews.items.forEach(review => { %>
-                <!-- Single Review -->
-                <div class="border-b pb-8">
+        <div class="space-y-8" id="reviewsList">
+            <% reviews.items.forEach((review, index) => { %>
+                <div class="border-b pb-8 review-item">
                     <div class="flex justify-between mb-4">
                         <div>
                             <div class="flex items-center gap-2 mb-2">
                                 <div class="flex text-yellow-400">
                                     <% for(let i = 1; i <= 5; i++) { %>
-                                        <% if (i <= review.rating) { %>
-                                            <i class="fas fa-star"></i>
-                                        <% } else if (i - 0.5 <= review.rating) { %>
-                                            <i class="fas fa-star-half-alt"></i>
-                                        <% } else { %>
-                                            <i class="far fa-star"></i>
-                                        <% } %>
+                                        <i class="fas fa-star <%= i <= review.rating ? '' : 'far' %>"></i>
                                     <% } %>
                                 </div>
                                 <span class="font-medium"><%= review.user_name %></span>
-                                <span class="bg-green-500 w-2 h-2 rounded-full"></span>
                             </div>
                             <p class="text-gray-600 mb-2">
                                 "<%= review.comment %>"
                             </p>
                             <span class="text-sm text-gray-500">Posted on <%= new Date(review.created_at).toLocaleDateString() %></span>
                         </div>
-                        <button class="text-gray-400 hover:text-gray-600">
-                            <i class="fas fa-ellipsis-h"></i>
-                        </button>
                     </div>
                 </div>
             <% }) %>
         </div>
 
-        <!-- Load More Button -->
-        <% if (reviews.currentPage < reviews.totalPages) { %>
-            <div class="text-center mt-8">
-                <a href="?review_page=<%= reviews.currentPage + 1 %>" class="px-6 py-2 border rounded hover:bg-gray-50">
-                    Load More Reviews
-                </a>
+        <!-- Reviews Pagination -->
+        <% if (reviews.totalPages > 1) { %>
+            <div class="flex justify-center gap-2 mt-8">
+                <% for(let i = 1; i <= reviews.totalPages; i++) { %>
+                    <a href="?review_page=<%= i %>#reviews" 
+                       class="px-4 py-2 border rounded <%= i === reviews.currentPage ? 'bg-black text-white' : 'hover:bg-gray-50' %>">
+                        <%= i %>
+                    </a>
+                <% } %>
             </div>
         <% } %>
     </div>
 
     <!-- Recommended Products Section -->
-    <div class="mt-16">
+    <div class="mt-16" id="recommended">
         <h2 class="text-2xl font-bold mb-8">You May Also Like</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <% recommended.items.forEach(item => { %>
-                <!-- Single Product Card -->
                 <a href="/products/<%= item.product_id %>" class="group">
                     <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4">
                         <img src="<%= item.photos[0] %>" 
@@ -175,5 +162,37 @@
                 </a>
             <% }) %>
         </div>
+
+        <!-- Recommended Pagination -->
+        <% if (recommended.totalPages > 1) { %>
+            <div class="flex justify-center gap-2 mt-8">
+                <% for(let i = 1; i <= recommended.totalPages; i++) { %>
+                    <a href="?page=<%= i %>#recommended" 
+                       class="px-4 py-2 border rounded <%= i === recommended.currentPage ? 'bg-black text-white' : 'hover:bg-gray-50' %>">
+                        <%= i %>
+                    </a>
+                <% } %>
+            </div>
+        <% } %>
     </div>
 </div>
+
+<script>
+    // Xử lý scroll position
+    document.addEventListener('DOMContentLoaded', function() {
+        // Kiểm tra hash trong URL
+        if (window.location.hash) {
+            const element = document.querySelector(window.location.hash);
+            if (element) {
+                // Scroll đến element với offset
+                const offset = 100; // Điều chỉnh offset nếu cần
+                const elementPosition = element.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - offset;
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth"
+                });
+            }
+        }
+    });
+</script>

@@ -598,6 +598,10 @@ video {
   pointer-events: none;
 }
 
+.visible{
+  visibility: visible;
+}
+
 .absolute{
   position: absolute;
 }
@@ -783,6 +787,10 @@ video {
   margin-top: 2rem;
 }
 
+.ml-4{
+  margin-left: 1rem;
+}
+
 .block{
   display: block;
 }
@@ -945,6 +953,10 @@ video {
 
 .flex-1{
   flex: 1 1 0%;
+}
+
+.flex-none{
+  flex: none;
 }
 
 .-translate-y-1\/2{
@@ -1898,6 +1910,10 @@ video {
   --tw-ring-offset-width: 2px;
 }
 
+.disabled\:opacity-50:disabled{
+  opacity: 0.5;
+}
+
 .group:hover .group-hover\:scale-105{
   --tw-scale-x: 1.05;
   --tw-scale-y: 1.05;
@@ -1975,6 +1991,10 @@ video {
 
   .md\:w-1\/2{
     width: 50%;
+  }
+
+  .md\:w-1\/4{
+    width: 25%;
   }
 
   .md\:grid-cols-2{
