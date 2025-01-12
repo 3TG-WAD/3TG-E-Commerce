@@ -8,73 +8,120 @@
 
 <header class="bg-white border-b border-gray-100 sticky top-0 z-50">
   <div class="container mx-auto px-4">
-    <div class="flex justify-between items-center h-20">
-      <!-- Logo -->
-      <a href="/" class="flex items-center group">
-        <img src="/images/favicon.ico" alt="SixT Store Logo" class="h-9 w-9 mr-3 group-hover:scale-105 transition-transform">
-        <div class="text-3xl font-bold tracking-tight text-gray-900" style="font-family: 'Roboto Slab', sans-serif;">SixT</div>
-      </a>
+    <div class="flex justify-between items-center h-16 lg:h-20">
+      <!-- Left section with Logo and Navigation -->
+      <div class="flex items-center space-x-8">
+        <!-- Logo -->
+        <a href="/" class="flex items-center group">
+          <img src="/images/favicon.ico" alt="SixT Store Logo" class="h-8 w-8 lg:h-9 lg:w-9 mr-2 lg:mr-3 group-hover:scale-105 transition-transform">
+          <div class="text-2xl lg:text-3xl font-bold tracking-tight text-gray-900" style="font-family: 'Roboto Slab', sans-serif;">SixT</div>
+        </a>
 
-      <!-- Main navigation -->
-      <nav class="hidden md:flex items-center space-x-8">
-        <div class="relative group" x-data="{ open: false }">
-          <button 
-            @click="open = !open"
-            @click.away="open = false"
-            class="flex items-center text-gray-600 hover:text-gray-900 py-2 transition-colors"
-          >
-            <span class="font-medium">Shop</span>
-            <svg class="w-4 h-4 ml-1.5 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
+        <!-- Main navigation - Desktop -->
+        <nav class="hidden md:flex items-center space-x-8">
+          <div class="relative group" x-data="{ open: false }">
+            <button 
+              @click="open = !open"
+              @click.away="open = false"
+              class="flex items-center text-gray-600 hover:text-gray-900 py-2 transition-colors"
+            >
+              <span class="font-medium">Shop</span>
+              <svg class="w-4 h-4 ml-1.5 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
 
-          <!-- Categories Dropdown -->
-          <div 
-            x-show="open"
-            x-transition:enter="transition ease-out duration-100"
-            x-transition:enter-start="opacity-0 scale-95"
-            x-transition:enter-end="opacity-100 scale-100"
-            x-transition:leave="transition ease-in duration-75"
-            x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-95"
-            class="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-1 border border-gray-100 z-50"
-            style="display: none;"
-          >
-            <% if (locals.categories && categories.length > 0) { %>
-              <% categories.forEach(function(category) { %>
-                <a 
-                  href="/categories/<%= category.slug %>"
-                  class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
-                >
-                  <%= category.category_name %>
-                </a>
-              <% }); %>
-            <% } %>
+            <!-- Categories Dropdown -->
+            <div 
+              x-show="open"
+              x-transition:enter="transition ease-out duration-100"
+              x-transition:enter-start="opacity-0 scale-95"
+              x-transition:enter-end="opacity-100 scale-100"
+              x-transition:leave="transition ease-in duration-75"
+              x-transition:leave-start="opacity-100 scale-100"
+              x-transition:leave-end="opacity-0 scale-95"
+              class="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-1 border border-gray-100 z-50"
+              style="display: none;"
+            >
+              <% if (locals.categories && categories.length > 0) { %>
+                <% categories.forEach(function(category) { %>
+                  <a 
+                    href="/categories/<%= category.slug %>"
+                    class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    <%= category.category_name %>
+                  </a>
+                <% }); %>
+              <% } %>
+            </div>
           </div>
-        </div>
-        <a href="#" class="text-gray-600 font-medium hover:text-gray-900 py-2 transition-colors">On Sale</a>
-        <a href="#" class="text-gray-600 font-medium hover:text-gray-900 py-2 transition-colors">New Arrivals</a>
-        <a href="#" class="text-gray-600 font-medium hover:text-gray-900 py-2 transition-colors">Brands</a>
-      </nav>
+          <a href="/categories/all?sort=price-asc" class="text-gray-600 font-medium hover:text-gray-900 py-2 transition-colors">On Sale</a>
+          <a href="/categories/all?sort=newest" class="text-gray-600 font-medium hover:text-gray-900 py-2 transition-colors">New Arrivals</a>
+          
+          <!-- Brands dropdown -->
+          <div class="relative group" x-data="{ open: false }">
+            <button 
+              @click="open = !open"
+              @click.away="open = false"
+              class="flex items-center text-gray-600 hover:text-gray-900 py-2 transition-colors"
+            >
+              <span class="font-medium">Brands</span>
+              <svg class="w-4 h-4 ml-1.5 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
 
-      <!-- Search and icons -->
-      <div class="flex items-center space-x-6">
-        <!-- Search -->
-        <div class="relative hidden md:block">
+            <!-- Brands Dropdown -->
+            <div 
+              x-show="open"
+              x-transition:enter="transition ease-out duration-100"
+              x-transition:enter-start="opacity-0 scale-95"
+              x-transition:enter-end="opacity-100 scale-100"
+              x-transition:leave="transition ease-in duration-75"
+              x-transition:leave-start="opacity-100 scale-100"
+              x-transition:leave-end="opacity-0 scale-95"
+              class="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-1 border border-gray-100 z-50"
+              style="display: none;"
+            >
+              <% if (locals.manufacturers && manufacturers.length > 0) { %>
+                <% manufacturers.forEach(function(brand) { %>
+                  <a 
+                    href="/categories/all?manufacturer=<%= brand.manufacturer_id %>"
+                    class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    <%= brand.name %>
+                  </a>
+                <% }); %>
+              <% } %>
+            </div>
+          </div>
+        </nav>
+      </div>
+
+      <!-- Mobile menu button -->
+      <button class="md:hidden p-2 text-gray-600" id="mobileMenuBtn">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
+        </svg>
+      </button>
+
+      <!-- Right section with Search and Icons -->
+      <div class="flex items-center">
+        <!-- Search - Hidden on mobile -->
+        <div class="relative hidden md:block mr-6">
           <input 
             type="search" 
             placeholder="Search products..." 
-            class="w-72 px-4 h-11 bg-gray-50 rounded-full pl-11 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 transition-all"
+            class="w-48 lg:w-72 px-4 h-10 lg:h-11 bg-gray-50 rounded-full pl-11 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 transition-all"
           >
-          <svg class="w-5 h-5 absolute left-4 top-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5 absolute left-4 top-2.5 lg:top-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
         
         <!-- Cart -->
         <a href="#" class="relative p-2 text-gray-600 hover:text-gray-900 transition-colors">
-          <i class="fas fa-shopping-cart text-xl"></i>
+          <i class="fas fa-shopping-cart text-lg lg:text-xl"></i>
           <span class="absolute -top-1 -right-1 bg-blue-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">0</span>
         </a>
 
@@ -118,13 +165,106 @@
           </div>
         <% } else { %>
           <a href="/auth/login" class="flex items-center p-2 text-gray-600 hover:text-gray-900 transition-colors">
-            <i class="fas fa-sign-in-alt text-xl mr-2"></i>
-            <span class="text-sm font-medium">Login</span>
+            <i class="fas fa-sign-in-alt text-lg lg:text-xl mr-2"></i>
+            <span class="text-sm font-medium hidden sm:inline">Login</span>
           </a>
         <% } %>
+      </div>
+    </div>
+
+    <!-- Mobile menu - Slide down -->
+    <div class="md:hidden hidden" id="mobileMenu">
+      <div class="py-4 space-y-4">
+        <div class="px-4">
+          <!-- Mobile Search -->
+          <div class="relative">
+            <input 
+              type="search" 
+              placeholder="Search products..." 
+              class="w-full px-4 h-10 bg-gray-50 rounded-full pl-11 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200"
+            >
+            <svg class="w-5 h-5 absolute left-4 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+        
+        <!-- Mobile Navigation Links -->
+        <div class="border-t border-gray-100">
+          <div class="px-4 py-3">
+            <button class="flex items-center justify-between w-full text-gray-600" id="mobileShopBtn">
+              <span class="font-medium">Shop</span>
+              <svg class="w-4 h-4 transform transition-transform" id="mobileShopIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+            <!-- Mobile Categories Dropdown -->
+            <div class="hidden mt-2 space-y-2 pl-4" id="mobileCategoriesMenu">
+              <% if (locals.categories && categories.length > 0) { %>
+                <% categories.forEach(function(category) { %>
+                  <a href="/categories/<%= category.slug %>" class="block py-2 text-sm text-gray-600">
+                    <%= category.category_name %>
+                  </a>
+                <% }); %>
+              <% } %>
+            </div>
+          </div>
+          
+          <a href="/categories/all?sort=price-asc" class="block px-4 py-3 text-gray-600 hover:bg-gray-50">On Sale</a>
+          <a href="/categories/all?sort=newest" class="block px-4 py-3 text-gray-600 hover:bg-gray-50">New Arrivals</a>
+          
+          <!-- Mobile Brands Dropdown -->
+          <div class="px-4 py-3">
+            <button class="flex items-center justify-between w-full text-gray-600" id="mobileBrandsBtn">
+              <span class="font-medium">Brands</span>
+              <svg class="w-4 h-4 transform transition-transform" id="mobileBrandsIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+            <div class="hidden mt-2 space-y-2 pl-4" id="mobileBrandsMenu">
+              <% if (locals.manufacturers && manufacturers.length > 0) { %>
+                <% manufacturers.forEach(function(brand) { %>
+                  <a href="/categories/all?manufacturer=<%= brand.manufacturer_id %>" class="block py-2 text-sm text-gray-600">
+                    <%= brand.name %>
+                  </a>
+                <% }); %>
+              <% } %>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </header>
 
 <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+<script>
+  // Mobile menu toggle
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const mobileShopBtn = document.getElementById('mobileShopBtn');
+  const mobileCategoriesMenu = document.getElementById('mobileCategoriesMenu');
+  const mobileShopIcon = document.getElementById('mobileShopIcon');
+
+  mobileMenuBtn.addEventListener('click', () => {
+    mobileMenu.classList.toggle('hidden');
+  });
+
+  mobileShopBtn.addEventListener('click', () => {
+    mobileCategoriesMenu.classList.toggle('hidden');
+    mobileShopIcon.classList.toggle('rotate-180');
+  });
+
+  // Add brands mobile menu toggle
+  const mobileBrandsBtn = document.getElementById('mobileBrandsBtn');
+  const mobileBrandsMenu = document.getElementById('mobileBrandsMenu');
+  const mobileBrandsIcon = document.getElementById('mobileBrandsIcon');
+
+  mobileBrandsBtn.addEventListener('click', () => {
+    mobileBrandsMenu.classList.toggle('hidden');
+    mobileBrandsIcon.classList.toggle('rotate-180');
+  });
+</script>

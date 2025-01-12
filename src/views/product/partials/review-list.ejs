@@ -1,0 +1,20 @@
+<% reviews.items.forEach((review, index) => { %>
+    <div class="border-b pb-8 review-item">
+        <div class="flex justify-between mb-4">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="flex text-yellow-400">
+                        <% for(let i = 1; i <= 5; i++) { %>
+                            <i class="fas fa-star <%= i <= review.rating ? '' : 'far' %>"></i>
+                        <% } %>
+                    </div>
+                    <span class="font-medium"><%= review.user_name %></span>
+                </div>
+                <p class="text-gray-600 mb-2">
+                    "<%= review.comment %>"
+                </p>
+                <span class="text-sm text-gray-500">Posted on <%= new Date(review.created_at).toLocaleDateString() %></span>
+            </div>
+        </div>
+    </div>
+<% }) %> 

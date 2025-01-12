@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
-const Product = require('../app/models/product');
+const Product = require('../modules/product/models/product');
 
 // MongoDB connection string
 const MONGODB_URI = 'mongodb://localhost:27017/ecommerce';
@@ -13,7 +13,7 @@ async function importProducts() {
         console.log('Connected to MongoDB');
 
         // Đọc file JSON
-        const jsonPath = path.join(__dirname, '../productdata.json');
+        const jsonPath = path.join(__dirname, '../../productdata.json');
         const productsData = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
 
         // Xóa tất cả sản phẩm cũ (tùy chọn)

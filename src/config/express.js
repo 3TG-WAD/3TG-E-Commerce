@@ -6,8 +6,10 @@ const expressLayouts = require('express-ejs-layouts');
 const flash = require('express-flash');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const authService = require('../modules/auth/services/auth.service');
+const dataMiddleware = require('../middleware/data.middleware');
 const categoryController = require('../modules/product/controllers/category.controller');
 const Category = require('../modules/product/models/category');
+const Manufacturer = require('../modules/product/models/manufacturer');
 
 const configureExpress = (app) => {
   // Middleware
@@ -64,6 +66,7 @@ const configureExpress = (app) => {
   // Static files
   app.use(express.static(path.join(__dirname, '..', 'public')));
   app.use('/css', express.static(path.join(__dirname, '..', 'public', 'css')));
+  app.use(express.static('src/public'));
 
   // Security headers
   app.use((req, res, next) => {
@@ -79,21 +82,8 @@ const configureExpress = (app) => {
     next();
   });
 
-  // Thêm middleware để lấy categories cho tất cả các routes
-  app.use(async (req, res, next) => {
-    try {
-      // Chỉ lấy categories cho non-API routes
-      if (!req.xhr && !req.path.startsWith('/api/')) {
-        const categories = await Category.find({});
-        res.locals.categories = categories;
-      }
-      next();
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      res.locals.categories = [];
-      next();
-    }
-  });
+  // Sử dụng middleware
+  app.use(dataMiddleware);
 
   // Routes
   const landingRoutes = require('../modules/home/routes/home.routes.js');
@@ -103,12 +93,16 @@ const configureExpress = (app) => {
   const orderRoutes = require('../modules/order/routes/order.routes');
   const profileRoutes = require('../modules/user/routes/profile.routes');
   const categoryRoutes = require('../modules/product/routes/category.routes');
+  const productRoutes = require('../modules/product/routes/product.routes');
+  const cartRoutes = require('../modules/cart/routes/cart.routes');
+
+  app.use('/', productRoutes);
   app.use('/', categoryRoutes);
   app.use('/', profileRoutes);
   app.use('/', landingRoutes);
   app.use('/auth', authRoutes);
   app.use('/oauth2', oauth2Routes);
-
+  app.use('/', cartRoutes);
   app.use('/', orderRoutes);
   // Add Google callback route at root level
   app.get('/authenticate', 

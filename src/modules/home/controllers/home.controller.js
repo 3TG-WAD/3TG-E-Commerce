@@ -1,4 +1,7 @@
-const productService = require('../../product/services/product.service');
+const ProductService = require('../../product/services/product.service');
+const productService = new ProductService();
+const Product = require('../../product/models/product');
+const Category = require('../../product/models/category');
 
 exports.getHomePage = async (req, res) => {
     try {
@@ -9,12 +12,16 @@ exports.getHomePage = async (req, res) => {
             productService.getDressStyles()
         ]);
 
+        // Lấy categories
+        const categories = await Category.find({});
+
         res.render('landing/index', {
             title: 'SixT Store - Your Fashion Destination',
             user: req.user || null,
-            newArrivals,     // Truyền dữ liệu vào view
-            topSelling,      // Truyền dữ liệu vào view
-            dressStyles      // Truyền dữ liệu vào view
+            newArrivals,
+            topSelling,
+            dressStyles,
+            categories
         });
     } catch (error) {
         console.error('Home page error:', error);
