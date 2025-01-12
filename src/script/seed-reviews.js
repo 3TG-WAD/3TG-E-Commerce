@@ -291,29 +291,14 @@ const reviews = [
   },
 ];
 
-const connectDB = async () => {
-  try {
-    await mongoose.connect(MONGODB_URI);
-    console.log("MongoDB Connected...");
-  } catch (err) {
-    console.error(err.message);
-    // Exit process with failure
-    process.exit(1);
-  }
-};
+async function seedReviews(connection) {
+    try {
+        await Review.deleteMany({});
+        await Review.insertMany(reviews);
+        console.log('Reviews inserted successfully!');
+    } catch (error) {
+        throw error;
+    }
+}
 
-const insertReviews = async () => {
-  try {
-    await connectDB();
-    // Insert data
-    await Review.insertMany(reviews);
-    console.log("Reviews inserted successfully!");
-  } catch (error) {
-    console.error("Error inserting reviews:", error);
-  } finally {
-    mongoose.connection.close();
-    console.log("Database connection closed");
-  }
-};
-
-insertReviews();
+module.exports = seedReviews;
