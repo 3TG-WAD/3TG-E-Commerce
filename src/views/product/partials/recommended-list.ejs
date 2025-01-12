@@ -1,0 +1,23 @@
+<% recommended.items.forEach(item => { %>
+    <a href="/products/<%= item.product_id %>" class="group">
+        <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4">
+            <img src="<%= item.photos[0] %>" 
+                 alt="<%= item.product_name %>" 
+                 class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+        </div>
+        <h3 class="font-medium mb-2"><%= item.product_name %></h3>
+        <div class="flex items-center justify-between">
+            <div>
+                <span class="font-bold"><%= formatToVND(item.price) %></span>
+                <% if (item.discount > 0) { %>
+                    <span class="text-sm text-gray-500 line-through ml-2">
+                        <%= formatToVND(item.original_price) %>
+                    </span>
+                <% } %>
+            </div>
+            <% if (item.discount > 0) { %>
+                <span class="text-red-500 text-sm">-<%= item.discount %>%</span>
+            <% } %>
+        </div>
+    </a>
+<% }) %> 

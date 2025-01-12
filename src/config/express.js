@@ -64,6 +64,7 @@ const configureExpress = (app) => {
   // Static files
   app.use(express.static(path.join(__dirname, '..', 'public')));
   app.use('/css', express.static(path.join(__dirname, '..', 'public', 'css')));
+  app.use(express.static('src/public'));
 
   // Security headers
   app.use((req, res, next) => {

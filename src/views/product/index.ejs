@@ -98,36 +98,19 @@
 
         <!-- Reviews List -->
         <div class="space-y-8" id="reviewsList">
-            <% reviews.items.forEach((review, index) => { %>
-                <div class="border-b pb-8 review-item">
-                    <div class="flex justify-between mb-4">
-                        <div>
-                            <div class="flex items-center gap-2 mb-2">
-                                <div class="flex text-yellow-400">
-                                    <% for(let i = 1; i <= 5; i++) { %>
-                                        <i class="fas fa-star <%= i <= review.rating ? '' : 'far' %>"></i>
-                                    <% } %>
-                                </div>
-                                <span class="font-medium"><%= review.user_name %></span>
-                            </div>
-                            <p class="text-gray-600 mb-2">
-                                "<%= review.comment %>"
-                            </p>
-                            <span class="text-sm text-gray-500">Posted on <%= new Date(review.created_at).toLocaleDateString() %></span>
-                        </div>
-                    </div>
-                </div>
-            <% }) %>
+            <%- include('partials/review-list', { reviews: reviews }) %>
         </div>
 
         <!-- Reviews Pagination -->
         <% if (reviews.totalPages > 1) { %>
-            <div class="flex justify-center gap-2 mt-8">
+            <div class="flex justify-center gap-2 mt-8" id="reviewsPagination">
                 <% for(let i = 1; i <= reviews.totalPages; i++) { %>
-                    <a href="?review_page=<%= i %>#reviews" 
-                       class="px-4 py-2 border rounded <%= i === reviews.currentPage ? 'bg-black text-white' : 'hover:bg-gray-50' %>">
-                        <%= i %>
-                    </a>
+                    <button type="button" 
+                            onclick="window.loadPage('reviews', '<%- i %>', '<%- product.id %>')"
+                            data-page="<%- i %>"
+                            class="cursor-pointer px-4 py-2 border rounded <%= i === reviews.currentPage ? 'bg-black text-white' : 'hover:bg-gray-50' %>">
+                        <%- i %>
+                    </button>
                 <% } %>
             </div>
         <% } %>
@@ -137,62 +120,24 @@
     <div class="mt-16" id="recommended">
         <h2 class="text-2xl font-bold mb-8">You May Also Like</h2>
         
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <% recommended.items.forEach(item => { %>
-                <a href="/products/<%= item.product_id %>" class="group">
-                    <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4">
-                        <img src="<%= item.photos[0] %>" 
-                             alt="<%= item.product_name %>" 
-                             class="w-full h-full object-cover group-hover:scale-105 transition-transform">
-                    </div>
-                    <h3 class="font-medium mb-2"><%= item.product_name %></h3>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <span class="font-bold"><%= formatToVND(item.price) %></span>
-                            <% if (item.discount > 0) { %>
-                                <span class="text-sm text-gray-500 line-through ml-2">
-                                    <%= formatToVND(item.original_price) %>
-                                </span>
-                            <% } %>
-                        </div>
-                        <% if (item.discount > 0) { %>
-                            <span class="text-red-500 text-sm">-<%= item.discount %>%</span>
-                        <% } %>
-                    </div>
-                </a>
-            <% }) %>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6" id="recommendedList">
+            <%- include('partials/recommended-list', { recommended: recommended }) %>
         </div>
 
         <!-- Recommended Pagination -->
         <% if (recommended.totalPages > 1) { %>
-            <div class="flex justify-center gap-2 mt-8">
+            <div class="flex justify-center gap-2 mt-8" id="recommendedPagination">
                 <% for(let i = 1; i <= recommended.totalPages; i++) { %>
-                    <a href="?page=<%= i %>#recommended" 
-                       class="px-4 py-2 border rounded <%= i === recommended.currentPage ? 'bg-black text-white' : 'hover:bg-gray-50' %>">
-                        <%= i %>
-                    </a>
+                    <button type="button"
+                            onclick="window.loadPage('recommended', '<%- i %>', '<%- product.id %>')"
+                            data-page="<%- i %>"
+                            class="cursor-pointer px-4 py-2 border rounded <%= i === recommended.currentPage ? 'bg-black text-white' : 'hover:bg-gray-50' %>">
+                        <%- i %>
+                    </button>
                 <% } %>
             </div>
         <% } %>
     </div>
 </div>
 
-<script>
-    // Xử lý scroll position
-    document.addEventListener('DOMContentLoaded', function() {
-        // Kiểm tra hash trong URL
-        if (window.location.hash) {
-            const element = document.querySelector(window.location.hash);
-            if (element) {
-                // Scroll đến element với offset
-                const offset = 100; // Điều chỉnh offset nếu cần
-                const elementPosition = element.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - offset;
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: "smooth"
-                });
-            }
-        }
-    });
-</script>
+<script src="/js/pagination.js" defer></script>

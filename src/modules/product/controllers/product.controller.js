@@ -172,5 +172,149 @@ const getProductDetail = async (req, res) => {
     }
 };
 
-module.exports = { getProductDetail };
+const getReviewsPartial = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const page = parseInt(req.query.page) || 1;
+        const limit = 3;
+        const skip = (page - 1) * limit;
+
+        const [reviews, totalReviews] = await Promise.all([
+            Review.aggregate([
+                { $match: { product_id: id } },
+                { $sort: { created_at: -1 } },
+                { $skip: skip },
+                { $limit: limit },
+                {
+                    $project: {
+                        rating: 1,
+                        comment: 1,
+                        created_at: 1,
+                        user_name: "Anonymous User"
+                    }
+                }
+            ]),
+            Review.countDocuments({ product_id: id })
+        ]);
+
+        const html = await res.render('product/partials/review-list', {
+            layout: false,
+            reviews: {
+                items: reviews,
+                currentPage: page,
+                totalPages: Math.ceil(totalReviews / limit),
+                totalReviews
+            }
+        }, (err, html) => {
+            if (err) {
+                return res.status(500).json({ success: false, error: err.message });
+            }
+            return res.json({ success: true, html });
+        });
+
+    } catch (error) {
+        console.error('Error in getReviewsPartial:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+const getRecommendedPartial = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const page = parseInt(req.query.page) || 1;
+        const limit = 4;
+        const skip = (page - 1) * limit;
+
+        const product = await Product.findOne({ product_id: id });
+        if (!product) {
+            throw new Error('Product not found');
+        }
+
+        const [recommendedProducts, totalRecommended] = await Promise.all([
+            Product.aggregate([
+                {
+                    $match: {
+                        category_id: product.category_id,
+                        product_id: { $ne: id }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "variants",
+                        localField: "product_id",
+                        foreignField: "product_id",
+                        as: "variants"
+                    }
+                },
+                {
+                    $addFields: {
+                        cheapestPrice: {
+                            $min: {
+                                $map: {
+                                    input: "$variants",
+                                    as: "variant",
+                                    in: {
+                                        $multiply: [
+                                            { $multiply: ["$$variant.price", 1000] },
+                                            { $subtract: [1, { $divide: ["$$variant.discount", 100] }] }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    $project: {
+                        product_id: 1,
+                        product_name: 1,
+                        photos: 1,
+                        price: { $multiply: [{ $min: "$variants.price" }, 1000] },
+                        original_price: { $multiply: [{ $min: "$variants.price" }, 1000] },
+                        discount: { $max: "$variants.discount" }
+                    }
+                },
+                { $skip: skip },
+                { $limit: limit }
+            ]),
+            Product.countDocuments({
+                category_id: product.category_id,
+                product_id: { $ne: id }
+            })
+        ]);
+
+        const html = await res.render('product/partials/recommended-list', {
+            layout: false,
+            recommended: {
+                items: recommendedProducts.map(item => ({
+                    ...item,
+                    finalPrice: item.price
+                })),
+                currentPage: page,
+                totalPages: Math.ceil(totalRecommended / limit)
+            },
+            formatToVND: (price) => {
+                return new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND'
+                }).format(price);
+            }
+        }, (err, html) => {
+            if (err) {
+                return res.status(500).json({ success: false, error: err.message });
+            }
+            return res.json({ success: true, html });
+        });
+
+    } catch (error) {
+        console.error('Error in getRecommendedPartial:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+module.exports = {
+    getProductDetail,
+    getReviewsPartial,
+    getRecommendedPartial
+};
 
