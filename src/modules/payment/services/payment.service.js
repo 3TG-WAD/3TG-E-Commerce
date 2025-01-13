@@ -23,10 +23,10 @@ class PaymentService {
       // Tạo payment data theo format của PayOS
       const paymentData = {
         orderCode: orderCode,
-        amount: cart.total_price + 15000, // Tổng tiền + phí ship
+        amount: cart.total_price + 0, // Tổng tiền + phí ship
         description: description,
         cancelUrl: `${process.env.APP_URL}/cart`,
-        returnUrl: `${process.env.APP_URL}/payment/success`,
+        returnUrl: `${process.env.APP_URL}/payment/callback`,
         items: cartItems.map(item => ({
           name: item.product_name,
           quantity: item.quantity,

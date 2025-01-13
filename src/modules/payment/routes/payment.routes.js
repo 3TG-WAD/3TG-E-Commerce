@@ -4,7 +4,7 @@ const paymentController = require('../controllers/payment.controller');
 const { isAuthenticated } = require('../../../middleware/auth.middleware');
 
 router.post('/payment/create', isAuthenticated, paymentController.initiatePayment);
-router.get('/payment/callback', paymentController.handlePaymentCallback);
+router.get('/payment/callback', isAuthenticated, paymentController.handlePaymentCallback);
 router.get('/payment/success', isAuthenticated, (req, res) => {
     res.render('payment/success');
 });

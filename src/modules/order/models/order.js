@@ -11,10 +11,6 @@ const orderSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  shop_id: {
-    type: String,
-    required: true
-  },
   items: [{
     product_id: String,
     variant_id: String,
@@ -26,14 +22,23 @@ const orderSchema = new mongoose.Schema({
     price: Number,
     discount: Number
   }],
-  shipping_address: String,
-  payment_method: String,
+  shipping_address: {
+    type: String,
+    required: true
+  },
+  payment_method: {
+    type: String,
+    required: true
+  },
   status: {
     type: String,
-    enum: ['pending', 'processing', 'shipping', 'completed', 'cancelled'],
+    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
     default: 'pending'
   },
-  total_amount: Number,
+  total_amount: {
+    type: Number,
+    required: true
+  },
   created_at: {
     type: Date,
     default: Date.now
