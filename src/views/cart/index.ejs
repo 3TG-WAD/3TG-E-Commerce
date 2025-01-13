@@ -1,3 +1,5 @@
+<script src="/js/payment.js" defer></script>
+
 <div class="container mx-auto px-4 py-8">
     <!-- Breadcrumb -->
     <nav class="flex mb-8 text-sm">
@@ -130,12 +132,13 @@
           </div>
   
           <!-- Checkout Button -->
-          <button class="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800 flex items-center justify-center gap-2">
-            Go to Checkout
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
-          </button>
+          <div class="w-full">
+            <button id="paymentButton" 
+                    class="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800 flex items-center justify-center gap-2">
+              <img src="/images/payment/payos-logo.png" alt="PayOS" class="h-5">
+              Thanh toán với PayOS
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -179,6 +182,41 @@
       console.error('Error removing item:', error);
     }
   }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded'); // Debug log
+    
+    const paymentButton = document.getElementById('paymentButton');
+    console.log('Payment button:', paymentButton); // Debug log
+    
+    if (paymentButton) {
+      paymentButton.addEventListener('click', async function() {
+        console.log('Payment button clicked'); // Debug log
+        
+        try {
+          const response = await fetch('/payment/create', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+
+          console.log('Payment response:', response); // Debug log
+          const data = await response.json();
+          console.log('Payment data:', data); // Debug log
+          
+          if (data.success) {
+            window.location.href = data.paymentUrl;
+          } else {
+            showNotification(data.message || 'Có lỗi xảy ra khi tạo thanh toán', 'error');
+          }
+        } catch (error) {
+          console.error('Payment error:', error);
+          showNotification('Có lỗi xảy ra khi tạo thanh toán', 'error');
+        }
+      });
+    }
+  });
   </script>
   
   <div id="toast" class="fixed top-4 right-4 z-50 transform transition-all duration-300 translate-x-full opacity-0">
@@ -196,3 +234,33 @@
         <p id="toast-message" class="text-sm text-gray-800"></p>
     </div>
   </div>
+
+  <script>
+  function showNotification(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
+    const successIcon = document.getElementById('toast-success');
+    const errorIcon = document.getElementById('toast-error');
+    
+    toastMessage.textContent = message;
+    
+    // Reset classes
+    successIcon.classList.add('hidden');
+    errorIcon.classList.add('hidden');
+    
+    // Show correct icon
+    if (type === 'success') {
+        successIcon.classList.remove('hidden');
+    } else {
+        errorIcon.classList.remove('hidden');
+    }
+    
+    // Show toast
+    toast.classList.remove('translate-x-full', 'opacity-0');
+    
+    // Hide after 3 seconds
+    setTimeout(() => {
+        toast.classList.add('translate-x-full', 'opacity-0');
+    }, 3000);
+  }
+  </script>

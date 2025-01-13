@@ -85,7 +85,8 @@ const configureExpress = (app) => {
   const categoryRoutes = require('../modules/product/routes/category.routes');
   const productRoutes = require('../modules/product/routes/product.routes');
   const cartRoutes = require('../modules/cart/routes/cart.routes');
-
+  const paymentRoutes = require('../modules/payment/routes/payment.routes');
+  app.use('/', paymentRoutes);
   app.use('/', productRoutes);
   app.use('/', categoryRoutes);
   app.use('/', profileRoutes);
