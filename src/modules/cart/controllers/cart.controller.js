@@ -8,6 +8,11 @@ class CartController {
             const { cartItems, total_price, total_items, discount } = 
                 await cartService.getCartData(userId, req.session.cartItems);
 
+            // Tính toán các khoản phí
+            const DELIVERY_FEE = 15000;
+            const discountAmount = discount ? (total_price * discount / 100) : 0;
+            const finalTotal = total_price - discountAmount + DELIVERY_FEE;
+
             const formattedCartItems = cartItems.map(item => ({
                 id: item._id || item.product_id,
                 product: {
@@ -28,6 +33,9 @@ class CartController {
                 total_price,
                 total_items,
                 discount,
+                discountAmount,
+                deliveryFee: DELIVERY_FEE,
+                finalTotal,
                 formatToVND
             });
         } catch (error) {
