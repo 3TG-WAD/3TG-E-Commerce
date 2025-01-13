@@ -5,21 +5,44 @@ class PaymentController {
   async initiatePayment(req, res) {
     try {
       const userId = req.user._id;
-      const { phone } = req.body;
+      const { phone, address } = req.body;
 
-      console.log('Received payment request:', { userId, phone });
+      console.log('Received payment request:', { userId, phone, address });
 
+      // Validate phone
       if (!phone || phone.trim().length !== 10) {
         console.log('Invalid phone number:', phone);
         return res.status(400).json({
           success: false,
-          message: 'Vui lòng nhập số điện thoại hợp lệ (10 số)'
+          message: 'Please enter a valid phone number (10 digits)'
         });
       }
 
-      // Cập nhật số điện thoại cho user
-      await User.findByIdAndUpdate(userId, { phone: phone.trim() });
-      console.log('Updated user phone number');
+      // Validate address
+      if (!address || address.trim().length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Please enter a valid shipping address'
+        });
+      }
+
+      // Lấy thông tin user hiện tại
+      const user = await User.findById(userId);
+
+      // Chỉ cập nhật nếu user chưa có thông tin
+      const updateFields = {};
+      if (!user.phone) {
+        updateFields.phone = phone.trim();
+      }
+      if (!user.address) {
+        updateFields.address = address.trim();
+      }
+
+      // Chỉ update khi có field cần cập nhật
+      if (Object.keys(updateFields).length > 0) {
+        await User.findByIdAndUpdate(userId, updateFields);
+        console.log('Updated user information:', updateFields);
+      }
 
       const paymentLink = await paymentService.createPayment(userId);
       console.log('Created payment link:', paymentLink);
@@ -32,7 +55,7 @@ class PaymentController {
       console.error('Payment initiation error:', error);
       res.status(500).json({
         success: false,
-        message: error.message || 'Có lỗi xảy ra khi tạo thanh toán'
+        message: error.message || 'An error occurred while creating payment'
       });
     }
   }

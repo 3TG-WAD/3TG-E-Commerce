@@ -10,9 +10,19 @@ document.addEventListener('DOMContentLoaded', function() {
         paymentButton.addEventListener('click', async function() {
             console.log('Payment button clicked');
             
-            const phone = document.getElementById('phone').value;
-            if (!phone) {
-                showNotification('Vui lòng nhập số điện thoại', 'error');
+            const phone = document.getElementById('phone').value.trim();
+            const address = document.getElementById('address').value.trim();
+
+            // Validate phone
+            const phoneRegex = /^[0-9]{10}$/;
+            if (!phone || !phoneRegex.test(phone)) {
+                showNotification('Please enter a valid phone number (10 digits)', 'error');
+                return;
+            }
+
+            // Validate address
+            if (!address) {
+                showNotification('Please enter a valid shipping address', 'error');
                 return;
             }
 
@@ -22,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ phone })
+                    body: JSON.stringify({ phone, address })
                 });
 
                 console.log('Payment response:', response);
@@ -32,11 +42,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     window.location.href = data.paymentUrl;
                 } else {
-                    showNotification(data.message || 'Có lỗi xảy ra khi tạo thanh toán', 'error');
+                    showNotification(data.message || 'An error occurred while creating payment', 'error');
                 }
             } catch (error) {
                 console.error('Payment error:', error);
-                showNotification('Có lỗi xảy ra khi tạo thanh toán', 'error');
+                showNotification('An error occurred while creating payment', 'error');
             }
         });
     } else {
