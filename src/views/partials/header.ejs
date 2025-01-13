@@ -106,9 +106,9 @@
       </button>
 
       <!-- Right section with Search and Icons -->
-      <div class="flex items-center">
+      <div class="flex items-center space-x-6">
         <!-- Search - Hidden on mobile -->
-        <div class="relative hidden md:block mr-6">
+        <div class="relative hidden md:block">
           <input 
             type="search" 
             placeholder="Search products..." 
@@ -121,13 +121,13 @@
         
         <!-- Cart Icon with Badge -->
         <div class="relative">
-            <a href="/cart" class="flex items-center">
-              <i class="fa-solid fa-cart-shopping text-xl"></i>
-                <span id="cartCount" 
-                      class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                    0
-                </span>
-            </a>
+          <a href="/cart" class="p-2 text-gray-600 hover:text-gray-900 transition-colors">
+            <i class="fa-solid fa-cart-shopping text-xl"></i>
+            <span id="cartCount" 
+                  class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center transform scale-90">
+                0
+            </span>
+          </a>
         </div>
 
         <!-- User Menu -->
@@ -136,10 +136,10 @@
             <button 
               @click="open = !open" 
               @click.away="open = false" 
-              class="flex items-center text-gray-600 hover:text-gray-900 p-2 transition-colors"
+              class="p-2 flex items-center text-gray-600 hover:text-gray-900 transition-colors"
             >
               <i class="fas fa-user text-xl"></i>
-              <svg class="w-4 h-4 ml-1.5" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 ml-1" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
@@ -169,9 +169,8 @@
             </div>
           </div>
         <% } else { %>
-          <a href="/auth/login" class="flex items-center p-2 text-gray-600 hover:text-gray-900 transition-colors">
-            <i class="fas fa-sign-in-alt text-lg lg:text-xl mr-2"></i>
-            <span class="text-sm font-medium hidden sm:inline">Login</span>
+          <a href="/auth/login" class="p-2 text-gray-600 hover:text-gray-900 transition-colors">
+            <i class="fas fa-right-to-bracket text-xl"></i>
           </a>
         <% } %>
       </div>

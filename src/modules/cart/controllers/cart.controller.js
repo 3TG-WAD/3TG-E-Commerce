@@ -62,8 +62,10 @@ class CartController {
     async addToCart(req, res) {
         try {
             const { product_id, quantity, size } = req.body;
-            console.log('Session state:', req.session);
-            console.log('Passport user:', req.session.passport?.user);
+            
+            // Kiểm tra user đã authenticate (bao gồm cả Google OAuth)
+            const userId = req.user?._id || req.session?.passport?.user;
+            console.log('Current user ID:', userId);
 
             if (!product_id || !size) {
                 return res.status(400).json({
@@ -80,7 +82,6 @@ class CartController {
                 });
             }
 
-            // Lấy variants để tính giá
             const variants = await Variant.find({ product_id: product_id });
             const variant = variants[0];
             
@@ -95,19 +96,21 @@ class CartController {
             const discount = variant.discount || 0;
             const finalPrice = originalPrice * (1 - discount / 100);
 
-            // Kiểm tra authentication qua passport
-            if (req.session && req.session.passport && req.session.passport.user) {
-                const userId = req.session.passport.user;
+            // Kiểm tra authentication bao gồm cả Google OAuth
+            if (userId) {
                 console.log('User is authenticated:', userId);
                 
                 // Tìm hoặc tạo cart cho user
                 let userCart = await Cart.findOne({ user_id: userId });
+                console.log('Found existing cart:', userCart);
+                
                 if (!userCart) {
                     userCart = await Cart.create({
                         user_id: userId,
                         total_items: 0,
                         total_price: 0
                     });
+                    console.log('Created new cart:', userCart);
                 }
 
                 // Tìm item trong database
@@ -120,9 +123,8 @@ class CartController {
                 if (existingItem) {
                     existingItem.quantity += parseInt(quantity) || 1;
                     await existingItem.save();
-                    console.log('Updated existing item:', existingItem);
                 } else {
-                    const newItem = await CartItem.create({
+                    await CartItem.create({
                         cart_id: userCart._id,
                         product_id: product_id,
                         variant_id: variant._id,
@@ -134,16 +136,19 @@ class CartController {
                         product_name: product.product_name,
                         photos: product.photos || []
                     });
-                    console.log('Created new item:', newItem);
                 }
 
-                // Cập nhật tổng trong cart
+                // Log trước khi cập nhật tổng
+                console.log('Updating cart totals for cart:', userCart._id);
                 const allCartItems = await CartItem.find({ cart_id: userCart._id });
+                console.log('All cart items:', allCartItems);
+
                 const totals = allCartItems.reduce((acc, item) => ({
                     total_items: acc.total_items + item.quantity,
                     total_price: acc.total_price + (item.final_price * item.quantity)
                 }), { total_items: 0, total_price: 0 });
 
+                console.log('New totals:', totals);
                 await Cart.findByIdAndUpdate(userCart._id, {
                     total_items: totals.total_items,
                     total_price: totals.total_price
@@ -190,7 +195,6 @@ class CartController {
 
         } catch (error) {
             console.error('Add to cart error:', error);
-            console.error('Session state at error:', req.session);
             res.status(500).json({
                 success: false,
                 message: 'Error adding item to cart'
@@ -201,46 +205,102 @@ class CartController {
     async updateQuantity(req, res) {
         try {
             const { itemId } = req.params;
-            const { change } = req.body;
+            const { quantity, size, product_id } = req.body;
             
-            if (!req.session.cartItems) {
-                return res.status(404).json({
+            if (quantity < 1) {
+                return res.status(400).json({
                     success: false,
-                    message: 'Cart not found'
+                    message: 'Quantity must be at least 1'
                 });
             }
 
-            // Tìm item dựa trên product_id và size
-            const itemIndex = req.session.cartItems.findIndex(
-                item => item.product_id === itemId && item.size === req.body.size
-            );
+            const userId = req.user?._id || req.session?.passport?.user;
 
-            if (itemIndex === -1) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Item not found in cart'
+            if (userId) {
+                // Xử lý cho authenticated users
+                const cart = await Cart.findOne({ user_id: userId });
+                if (!cart) {
+                    return res.status(404).json({
+                        success: false,
+                        message: 'Cart not found'
+                    });
+                }
+
+                const cartItem = await CartItem.findById(itemId);
+                if (!cartItem) {
+                    return res.status(404).json({
+                        success: false,
+                        message: 'Cart item not found'
+                    });
+                }
+
+                // Cập nhật số lượng
+                cartItem.quantity = parseInt(quantity);
+                await cartItem.save();
+
+                // Tính toán lại tổng
+                const allCartItems = await CartItem.find({ cart_id: cart._id });
+                const totals = allCartItems.reduce((acc, item) => ({
+                    total_items: acc.total_items + item.quantity,
+                    total_price: acc.total_price + (item.final_price * item.quantity)
+                }), { total_items: 0, total_price: 0 });
+
+                // Cập nhật cart
+                cart.total_items = totals.total_items;
+                cart.total_price = totals.total_price;
+                await cart.save();
+
+                return res.json({
+                    success: true,
+                    message: 'Quantity updated',
+                    cart: {
+                        total_items: cart.total_items,
+                        total_price: cart.total_price
+                    }
                 });
-            }
-
-            // Cập nhật số lượng
-            const newQuantity = req.session.cartItems[itemIndex].quantity + change;
-            
-            if (newQuantity <= 0) {
-                // Xóa item nếu số lượng = 0
-                req.session.cartItems.splice(itemIndex, 1);
             } else {
-                req.session.cartItems[itemIndex].quantity = newQuantity;
-            }
+                // Phần xử lý cho guest users
+                if (!req.session.cartItems) {
+                    return res.status(404).json({
+                        success: false,
+                        message: 'Cart not found'
+                    });
+                }
 
-            res.json({
-                success: true,
-                message: 'Quantity updated successfully'
-            });
+                // Tìm và cập nhật item trong session
+                const itemIndex = req.session.cartItems.findIndex(item => 
+                    item.product_id === product_id && item.size === size
+                );
+
+                if (itemIndex === -1) {
+                    return res.status(404).json({
+                        success: false,
+                        message: 'Item not found in cart'
+                    });
+                }
+
+                req.session.cartItems[itemIndex].quantity = parseInt(quantity);
+
+                // Tính toán lại tổng
+                const totals = req.session.cartItems.reduce((acc, item) => ({
+                    total_items: acc.total_items + item.quantity,
+                    total_price: acc.total_price + (item.final_price * item.quantity)
+                }), { total_items: 0, total_price: 0 });
+
+                res.json({
+                    success: true,
+                    message: 'Quantity updated',
+                    cart: {
+                        total_items: totals.total_items,
+                        total_price: totals.total_price
+                    }
+                });
+            }
         } catch (error) {
-            console.error('Update quantity error:', error);
+            console.error('Error updating quantity:', error);
             res.status(500).json({
                 success: false,
-                message: 'Error updating quantity'
+                message: 'Could not update quantity'
             });
         }
     }
@@ -248,37 +308,69 @@ class CartController {
     async removeItem(req, res) {
         try {
             const { itemId } = req.params;
-            
-            if (!req.session.cartItems) {
+            const userId = req.user?._id || req.session?.passport?.user;
+            const cart = await Cart.findOne({ user_id: userId });
+
+            if (!cart) {
                 return res.status(404).json({
                     success: false,
                     message: 'Cart not found'
                 });
             }
 
-            // Tìm và xóa item dựa trên product_id và size
-            const itemIndex = req.session.cartItems.findIndex(
-                item => item.product_id === itemId && item.size === req.body.size
-            );
+            const cartItem = await CartItem.findOneAndDelete({
+                _id: itemId,
+                cart_id: cart._id
+            });
 
-            if (itemIndex === -1) {
+            if (!cartItem) {
                 return res.status(404).json({
                     success: false,
                     message: 'Item not found in cart'
                 });
             }
 
-            req.session.cartItems.splice(itemIndex, 1);
-            
+            // Recalculate cart totals
+            const allItems = await CartItem.find({ cart_id: cart._id });
+            const totals = allItems.reduce((acc, item) => ({
+                total_items: acc.total_items + item.quantity,
+                total_price: acc.total_price + (item.final_price * item.quantity)
+            }), { total_items: 0, total_price: 0 });
+
+            cart.total_items = totals.total_items;
+            cart.total_price = totals.total_price;
+            await cart.save();
+
+            // Lưu lại session nếu user chưa đăng nhập
+            if (!userId) {
+                req.session.cart = allItems.map(item => ({
+                    product_id: item.product_id,
+                    variant_id: item.variant_id,
+                    quantity: item.quantity,
+                    price: item.price,
+                    final_price: item.final_price,
+                    discount: item.discount,
+                    size: item.size,
+                    product_name: item.product_name,
+                    photos: item.photos
+                }));
+                await req.session.save();
+            }
+
             res.json({
                 success: true,
-                message: 'Item removed successfully'
+                message: 'Item removed from cart',
+                cart: {
+                    total_items: cart.total_items,
+                    total_price: cart.total_price
+                }
             });
+
         } catch (error) {
-            console.error('Remove item error:', error);
+            console.error('Error removing item:', error);
             res.status(500).json({
                 success: false,
-                message: 'Error removing item'
+                message: 'Could not remove item'
             });
         }
     }
@@ -287,18 +379,29 @@ class CartController {
         try {
             let count = 0;
             
-            if (req.session && req.session.passport && req.session.passport.user) {
+            // Kiểm tra user đã authenticate (bao gồm cả Google OAuth)
+            const userId = req.user?._id || req.session?.passport?.user;
+            console.log('Getting cart count for user:', userId);
+            
+            if (userId) {
                 // Nếu user đã đăng nhập, lấy count từ database
-                const userCart = await Cart.findOne({ user_id: req.session.passport.user });
+                const userCart = await Cart.findOne({ user_id: userId });
+                console.log('User cart from DB:', userCart);
+                
                 if (userCart) {
                     count = userCart.total_items;
+                    console.log('Cart count from DB:', count);
+                } else {
+                    console.log('No cart found in DB for user');
                 }
             } else {
                 // Nếu chưa đăng nhập, lấy count từ session
                 const cartItems = req.session.cartItems || [];
                 count = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+                console.log('Cart count from session:', count);
             }
             
+            console.log('Final cart count:', count);
             res.json({
                 success: true,
                 count: count

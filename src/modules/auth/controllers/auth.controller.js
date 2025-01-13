@@ -2,6 +2,9 @@ const User = require("../../user/models/user");
 const authService = require("../services/auth.service");
 const { mergeCart } = require('../../../middleware/cart.middleware');
 
+// Tạo biến global để lưu cart tạm thời
+let tempGlobalCart = new Map();
+
 exports.renderLogin = (req, res) => {
   const errorMessage = req.flash("error");
   const successMessage = req.flash("success");
@@ -145,14 +148,72 @@ exports.resetPassword = async (req, res) => {
     }
 };
 
-exports.googleCallback = (req, res) => {
-  // Check if user is authenticated
-  if (!req.user) {
-    req.flash('error', 'Google authentication failed');
-    return res.redirect('/auth/login');
-  }
+exports.startGoogleAuth = async (req, res, next) => {
+    try {
+        // Đợi một chút để đảm bảo cart đã được cập nhật trong session
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Lưu cart vào biến global với session ID làm key
+        const sessionId = req.session.id;
+        const cartItems = req.session.cartItems || [];
+        console.log('Current session cartItems:', cartItems);
+        
+        tempGlobalCart.set(sessionId, cartItems);
+        console.log('Saved cart to global storage for session:', sessionId);
+        console.log('Cart items:', tempGlobalCart.get(sessionId));
+        
+        next();
+    } catch (error) {
+        console.error('Error in startGoogleAuth:', error);
+        next(error);
+    }
+};
 
-  // Redirect to home page after successful login
-  req.flash('success', 'Successfully logged in with Google!');
-  res.redirect('/');
+exports.googleCallback = async (req, res) => {
+    try {
+        console.log('Google callback started - User:', req.user?._id);
+        
+        // Lấy cart từ global storage không phụ thuộc session ID
+        const guestCart = global.tempGoogleCart || [];
+        console.log('Retrieved cart from global storage:', guestCart);
+        
+        // Tạo session mới
+        req.session.regenerate(async (err) => {
+            if (err) {
+                console.error('Session regeneration error:', err);
+                return res.redirect('/auth/login');
+            }
+
+            try {
+                // Copy lại thông tin passport
+                req.session.passport = { user: req.user._id };
+                
+                // Merge cart nếu có
+                if (guestCart && guestCart.length > 0) {
+                    console.log('Attempting to merge cart for user:', req.user._id);
+                    console.log('Cart items to merge:', guestCart);
+                    await mergeCart(req.user._id, guestCart);
+                    console.log('Cart merged successfully');
+                } else {
+                    console.log('No guest cart items to merge');
+                }
+
+                // Xóa cart khỏi global storage
+                global.tempGoogleCart = null;
+                console.log('Cleaned up global storage');
+
+                await req.session.save();
+                console.log('Session saved, redirecting...');
+                res.redirect('/');
+            } catch (error) {
+                console.error('Error in cart merging:', error);
+                console.error('Error details:', error.stack);
+                res.redirect('/');
+            }
+        });
+    } catch (error) {
+        console.error('Google callback error:', error);
+        console.error('Error details:', error.stack);
+        res.redirect('/auth/login');
+    }
 };

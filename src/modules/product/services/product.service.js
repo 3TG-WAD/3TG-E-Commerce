@@ -6,8 +6,7 @@ class ProductService {
   async getNewArrivals() {
     try {
       const variants = await Variant.find().select('product_id price discount');
-      console.log('Variants found:', variants.length); // Debug log
-
+      
       const variantsByProduct = variants.reduce((acc, variant) => {
         if (!acc[variant.product_id]) {
           acc[variant.product_id] = [];
@@ -24,7 +23,6 @@ class ProductService {
 
       const newProducts = products.map(product => {
         const productVariants = variantsByProduct[product.product_id] || [];
-        console.log(`Variants for product ${product.product_id}:`, productVariants.length);
         
         const cheapestVariant = productVariants.reduce((min, curr) => 
           curr.price < min.price ? curr : min

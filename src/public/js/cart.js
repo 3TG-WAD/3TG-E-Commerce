@@ -27,22 +27,12 @@ const Cart = {
     updateCartCount(count) {
         const cartCount = document.querySelector('#cartCount');
         if (cartCount) {
-            // Cập nhật số lượng
-            cartCount.textContent = count || '0';
+            cartCount.textContent = count > 99 ? '99+' : count;
             
-            // Ẩn badge khi số lượng = 0
-            if (count <= 0) {
-                cartCount.classList.add('hidden');
+            if (count > 99) {
+                cartCount.classList.add('w-6');
             } else {
-                cartCount.classList.remove('hidden');
-                
-                // Điều chỉnh kích thước cho số có nhiều chữ số
-                if (count > 99) {
-                    cartCount.textContent = '99+';
-                    cartCount.classList.add('w-6');
-                } else {
-                    cartCount.classList.remove('w-6');
-                }
+                cartCount.classList.remove('w-6');
             }
         }
     }
@@ -63,15 +53,19 @@ async function addToCart(productId) {
         }
 
         const quantity = parseInt(document.querySelector('#quantity').value || '1');
-        const size = document.querySelector('#productSize')?.value;
+        const selectedSize = document.querySelector('input[name="size"]:checked')?.value;
+        const sizeError = document.querySelector('#size-error');
 
         // Validate size
-        if (!size) {
-            showNotification('Please select a size', 'error');
+        if (!selectedSize) {
+            sizeError.classList.remove('hidden');
             return;
         }
+        
+        // Hide error if size is selected
+        sizeError.classList.add('hidden');
 
-        console.log('Sending cart request:', { productId, quantity, size }); // Debug
+        console.log('Sending cart request:', { productId, quantity, size: selectedSize }); // Debug
 
         const response = await fetch('/cart/add', {
             method: 'POST',
@@ -81,7 +75,7 @@ async function addToCart(productId) {
             body: JSON.stringify({
                 product_id: productId,
                 quantity: quantity,
-                size: size
+                size: selectedSize
             })
         });
 
@@ -100,9 +94,154 @@ async function addToCart(productId) {
 }
 
 function showNotification(message, type = 'success') {
-    if (type === 'error') {
-        alert('Error: ' + message);
-    } else {
-        alert(message);
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
+    const successIcon = document.getElementById('toast-success');
+    const errorIcon = document.getElementById('toast-error');
+    
+    if (!toast || !toastMessage || !successIcon || !errorIcon) {
+        console.error('Toast elements not found');
+        return;
     }
+    
+    // Set message
+    toastMessage.textContent = message;
+    
+    // Show correct icon
+    successIcon.classList.add('hidden');
+    errorIcon.classList.add('hidden');
+    
+    if (type === 'success') {
+        successIcon.classList.remove('hidden');
+    } else if (type === 'error') {
+        errorIcon.classList.remove('hidden');
+    }
+    
+    // Show toast
+    toast.classList.remove('translate-x-full', 'opacity-0');
+    
+    // Hide toast after 3 seconds
+    setTimeout(() => {
+        toast.classList.add('translate-x-full', 'opacity-0');
+    }, 3000);
 }
+
+// Add event listeners for size selection
+document.addEventListener('DOMContentLoaded', () => {
+    Cart.init();
+    
+    // Hide error message when a size is selected
+    const sizeInputs = document.querySelectorAll('input[name="size"]');
+    const sizeError = document.querySelector('#size-error');
+    
+    sizeInputs.forEach(input => {
+        input.addEventListener('change', () => {
+            sizeError.classList.add('hidden');
+        });
+    });
+});
+
+const updateCartCount = async (count) => {
+    const cartCount = document.getElementById('cartCount');
+    if (cartCount) {
+        cartCount.textContent = count;
+        
+        // Điều chỉnh kích thước cho số có nhiều chữ số
+        if (count > 99) {
+            cartCount.textContent = '99+';
+            cartCount.classList.add('w-6');
+        } else {
+            cartCount.classList.remove('w-6');
+        }
+    }
+};
+
+const updateCartQuantity = async (itemId, quantity) => {
+    console.log('Updating cart with ID:', itemId, 'Quantity:', quantity);
+    
+    try {
+        if (!itemId) {
+            throw new Error('Item ID is required');
+        }
+
+        // Thêm size vào request body
+        const cartItem = document.querySelector(`[data-cart-item="${itemId}"]`);
+        const size = cartItem?.dataset.size;
+
+        const response = await fetch(`/cart/update/${itemId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                quantity,
+                size,
+                product_id: itemId // Thêm product_id cho guest users
+            })
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to update cart');
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            updateCartCount(data.cart.total_items);
+            showNotification('Cart updated successfully', 'success');
+            
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        } else {
+            throw new Error(data.message || 'Failed to update cart');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification(error.message || 'Failed to update cart', 'error');
+    }
+};
+
+const removeCartItem = async (itemId) => {
+    console.log('Removing item with ID:', itemId);
+    
+    try {
+        if (!itemId) {
+            throw new Error('Item ID is required');
+        }
+
+        const response = await fetch(`/cart/remove/${itemId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to remove item');
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            updateCartCount(data.cart.total_items);
+            showNotification('Item removed from cart', 'success');
+            
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        } else {
+            throw new Error(data.message || 'Failed to remove item');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification(error.message || 'Failed to remove item', 'error');
+    }
+};
+
+// Export functions to window object
+window.updateCartCount = updateCartCount;
+window.updateCartQuantity = updateCartQuantity;
+window.removeCartItem = removeCartItem;
