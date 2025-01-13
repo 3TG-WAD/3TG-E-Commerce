@@ -11,7 +11,7 @@ const s3Client = new S3Client({
 });
 
 class S3Service {
-  async uploadFile(file, folder = 'avatars') {
+  async uploadFile(file, folder = 'six-t') {
     try {
       const fileName = `${folder}/${Date.now()}-${file.originalname}`;
       
