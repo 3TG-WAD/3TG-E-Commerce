@@ -3,23 +3,28 @@ const CartItem = require('../../cart/models/cartItems');
 const Order = require('../../order/models/order');
 const User = require('../../user/models/user');
 const payOS = require('../../../config/payos');
-
+const { generateTransactionCode } = require('../helpers/payment.helper');
 class PaymentService {
   async createPayment(userId) {
     try {
+      const user = await User.findById(userId);
+      if (!user) {
+        throw new Error('User not found');
+      }
+      
       const cart = await Cart.findOne({ user_id: userId });
       if (!cart) {
-        throw new Error('Không tìm thấy giỏ hàng');
+        throw new Error('Cart not found');
       }
 
       const cartItems = await CartItem.find({ cart_id: cart._id });
       const itemCount = cartItems.length;
-      const description = `Thanh toan ${itemCount} san pham`;
+      const description = generateTransactionCode({ itemCount, buyerName: user.name });
       const orderCode = Math.floor(Date.now() / 1000);
-
+      const deliveryFee = 15000;
       const paymentData = {
         orderCode: orderCode,
-        amount: cart.total_price + 0,
+        amount: cart.total_price + deliveryFee,
         description: description,
         cancelUrl: `${process.env.APP_URL}/cart`,
         returnUrl: `${process.env.APP_URL}/payment/callback`,
