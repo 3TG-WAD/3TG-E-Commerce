@@ -24,6 +24,7 @@ class CartController {
             res.render('cart/index', {
                 title: 'Shopping Cart',
                 cartItems: formattedCartItems,
+                user: req.user,
                 total_price,
                 total_items,
                 discount,

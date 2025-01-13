@@ -1,3 +1,5 @@
+<script src="/js/payment.js" defer></script>
+
 <div class="container mx-auto px-4 py-8">
     <!-- Breadcrumb -->
     <nav class="flex mb-8 text-sm">
@@ -129,13 +131,51 @@
             </button>
           </div>
   
+          <!-- Form thông tin giao hàng -->
+          <div class="space-y-4 mb-6">
+            <!-- Số điện thoại -->
+            <div>
+              <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+              <input 
+                type="tel" 
+                id="phone" 
+                name="phone"
+                pattern="[0-9]{10}"
+                value="<%= user.phone || '' %>"
+                placeholder="<%= user.phone ? user.phone : 'Enter your phone number' %>"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
+                required
+              >
+              <% if (!user.phone) { %>
+                <p class="mt-1 text-sm text-gray-500">Please enter your phone number to contact us when delivering</p>
+              <% } %>
+            </div>
+
+            <!-- Địa chỉ -->
+            <div>
+              <label for="address" class="block text-sm font-medium text-gray-700">Shipping Address</label>
+              <input 
+                type="text" 
+                id="address" 
+                name="address"
+                value="<%= user.address || '' %>"
+                placeholder="<%= user.address ? user.address : 'Enter your shipping address' %>"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
+                required
+              >
+              <% if (!user.address) { %>
+                <p class="mt-1 text-sm text-gray-500">Please enter your address to deliver to you</p>
+              <% } %>
+            </div>
+          </div>
+  
           <!-- Checkout Button -->
-          <button class="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800 flex items-center justify-center gap-2">
-            Go to Checkout
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
-          </button>
+          <div class="w-full">
+            <button id="paymentButton" 
+                    class="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800 flex items-center justify-center gap-2">
+              Pay with PayOS
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -179,6 +219,48 @@
       console.error('Error removing item:', error);
     }
   }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded'); // Debug log
+    
+    const paymentButton = document.getElementById('paymentButton');
+    console.log('Payment button:', paymentButton); // Debug log
+    
+    if (paymentButton) {
+      paymentButton.addEventListener('click', async function() {
+        console.log('Payment button clicked'); // Debug log
+        
+        const phone = document.getElementById('phone').value;
+        if (!phone) {
+          showNotification('Please enter your phone number', 'error');
+          return;
+        }
+
+        try {
+          const response = await fetch('/payment/create', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ phone })
+          });
+
+          console.log('Payment response:', response); // Debug log
+          const data = await response.json();
+          console.log('Payment data:', data); // Debug log
+          
+          if (data.success) {
+            window.location.href = data.paymentUrl;
+          } else {
+            showNotification(data.message || 'An error occurred while creating payment', 'error');
+          }
+        } catch (error) {
+          console.error('Payment error:', error);
+          showNotification('An error occurred while creating payment', 'error');
+        }
+      });
+    }
+  });
   </script>
   
   <div id="toast" class="fixed top-4 right-4 z-50 transform transition-all duration-300 translate-x-full opacity-0">
@@ -196,3 +278,91 @@
         <p id="toast-message" class="text-sm text-gray-800"></p>
     </div>
   </div>
+
+  <script>
+  function showNotification(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
+    const successIcon = document.getElementById('toast-success');
+    const errorIcon = document.getElementById('toast-error');
+    
+    toastMessage.textContent = message;
+    
+    // Reset classes
+    successIcon.classList.add('hidden');
+    errorIcon.classList.add('hidden');
+    
+    // Show correct icon
+    if (type === 'success') {
+        successIcon.classList.remove('hidden');
+    } else {
+        errorIcon.classList.remove('hidden');
+    }
+    
+    // Show toast
+    toast.classList.remove('translate-x-full', 'opacity-0');
+    
+    // Hide after 3 seconds
+    setTimeout(() => {
+        toast.classList.add('translate-x-full', 'opacity-0');
+    }, 3000);
+  }
+  </script>
+
+  <script>
+document.getElementById('paymentButton').addEventListener('click', async () => {
+  const phoneInput = document.getElementById('phone');
+  const phone = phoneInput.value.trim();
+
+  console.log('Phone value:', phone); // Debug log
+
+  // Validate số điện thoại với regex
+  const phoneRegex = /^[0-9]{10}$/;
+  if (!phone || !phoneRegex.test(phone)) {
+    showNotification('Please enter a valid phone number (10 digits)', 'error');
+    phoneInput.focus();
+    return;
+  }
+
+  try {
+    // Tạo FormData object
+    const formData = new FormData();
+    formData.append('phone', phone);
+
+    const response = await fetch('/payment/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        phone: phone // Đảm bảo gửi đúng format
+      })
+    });
+
+    console.log('Request sent with phone:', phone); // Debug log
+
+    const data = await response.json();
+    console.log('Payment response:', data); // Debug log
+
+    if (data.success) {
+      window.location.href = data.paymentUrl;
+    } else {
+      showNotification(data.message || 'An error occurred while creating payment', 'error');
+    }
+  } catch (error) {
+    console.error('Payment error:', error);
+    showNotification('An error occurred while creating payment', 'error');
+  }
+});
+
+// Thêm validate khi nhập
+document.getElementById('phone').addEventListener('input', function(e) {
+  // Chỉ cho phép nhập số
+  this.value = this.value.replace(/[^0-9]/g, '');
+  
+  // Giới hạn 10 số
+  if (this.value.length > 10) {
+    this.value = this.value.slice(0, 10);
+  }
+});
+</script>

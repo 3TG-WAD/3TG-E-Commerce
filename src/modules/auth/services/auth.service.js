@@ -141,7 +141,7 @@ class AuthService {
             console.log('Creating new user for Google auth');
             // Tạo user mới nếu chưa tồn tại
             user = await User.create({
-                username: profile.displayName,
+                username: profile.emails[0].value.split('@')[0],
                 email: profile.emails[0].value,
                 password: crypto.randomBytes(16).toString('hex'),
                 isActive: true,
