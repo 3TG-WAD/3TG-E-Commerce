@@ -1,7 +1,12 @@
+/**
+ * Cart Module - Handles all cart-related functionality
+ */
 const Cart = {
+    /**
+     * Initialize cart functionality
+     */
     async init() {
         try {
-            // Lấy số lượng từ session thông qua API
             const response = await fetch('/cart/count');
             const data = await response.json();
             
@@ -14,6 +19,10 @@ const Cart = {
         }
     },
 
+    /**
+     * Add item to cart and update cart count
+     * @param {Object} item - Cart item to be added
+     */
     async addItem(item) {
         try {
             const response = await fetch('/cart/count');
@@ -24,54 +33,127 @@ const Cart = {
         }
     },
 
+    /**
+     * Update cart count display
+     * @param {number} count - New cart count
+     */
     updateCartCount(count) {
         const cartCount = document.querySelector('#cartCount');
         if (cartCount) {
             cartCount.textContent = count > 99 ? '99+' : count;
-            
-            if (count > 99) {
-                cartCount.classList.add('w-6');
-            } else {
-                cartCount.classList.remove('w-6');
-            }
+            this._updateCartCountWidth(cartCount, count);
+        }
+    },
+
+    /**
+     * Update cart count element width based on count
+     * @private
+     * @param {HTMLElement} element - Cart count element
+     * @param {number} count - Cart count
+     */
+    _updateCartCountWidth(element, count) {
+        if (count > 99) {
+            element.classList.add('w-6');
+        } else {
+            element.classList.remove('w-6');
         }
     }
 };
 
-// Initialize cart when page loads
-document.addEventListener('DOMContentLoaded', () => {
-    Cart.init();
-});
+/**
+ * Cart UI Functions
+ */
+const CartUI = {
+    /**
+     * Add product to cart
+     * @param {string} productId - Product ID
+     */
+    async addToCart(productId) {
+        try {
+            if (!this._validateProductId(productId)) return;
 
-// Add to cart function for product pages
-async function addToCart(productId) {
-    try {
+            const { quantity, selectedSize } = this._getProductDetails();
+            if (!this._validateSize(selectedSize)) return;
+
+            await this._sendAddToCartRequest(productId, quantity, selectedSize);
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            showNotification('Error adding product to cart', 'error');
+        }
+    },
+
+    /**
+     * Update cart item quantity
+     * @param {string} itemId - Cart item ID
+     * @param {number} quantity - New quantity
+     */
+    async updateCartQuantity(itemId, quantity) {
+        try {
+            if (!this._validateItemId(itemId)) return;
+
+            const cartItem = document.querySelector(`[data-cart-item="${itemId}"]`);
+            const size = cartItem?.dataset.size;
+
+            await this._sendUpdateQuantityRequest(itemId, quantity, size);
+        } catch (error) {
+            console.error('Error:', error);
+            showNotification(error.message || 'Failed to update cart', 'error');
+        }
+    },
+
+    /**
+     * Remove item from cart
+     * @param {string} itemId - Cart item ID
+     */
+    async removeCartItem(itemId) {
+        try {
+            if (!this._validateItemId(itemId)) return;
+            await this._sendRemoveItemRequest(itemId);
+        } catch (error) {
+            console.error('Error:', error);
+            showNotification(error.message || 'Failed to remove item', 'error');
+        }
+    },
+
+    /**
+     * Private helper methods
+     */
+    _validateProductId(productId) {
         if (!productId) {
             console.error('Product ID is missing');
             showNotification('Invalid product', 'error');
-            return;
+            return false;
         }
+        return true;
+    },
 
+    _validateItemId(itemId) {
+        if (!itemId) {
+            throw new Error('Item ID is required');
+        }
+        return true;
+    },
+
+    _getProductDetails() {
         const quantity = parseInt(document.querySelector('#quantity').value || '1');
         const selectedSize = document.querySelector('input[name="size"]:checked')?.value;
-        const sizeError = document.querySelector('#size-error');
+        return { quantity, selectedSize };
+    },
 
-        // Validate size
+    _validateSize(selectedSize) {
+        const sizeError = document.querySelector('#size-error');
         if (!selectedSize) {
             sizeError.classList.remove('hidden');
-            return;
+            return false;
         }
-        
-        // Hide error if size is selected
         sizeError.classList.add('hidden');
+        return true;
+    },
 
-        console.log('Sending cart request:', { productId, quantity, size: selectedSize }); // Debug
-
+    async _sendAddToCartRequest(productId, quantity, selectedSize) {
         const response = await fetch('/cart/add', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 product_id: productId,
                 quantity: quantity,
@@ -87,97 +169,13 @@ async function addToCart(productId) {
         } else {
             showNotification(data.message, 'error');
         }
-    } catch (error) {
-        console.error('Error adding to cart:', error);
-        showNotification('Error adding product to cart', 'error');
-    }
-}
+    },
 
-function showNotification(message, type = 'success') {
-    const toast = document.getElementById('toast');
-    const toastMessage = document.getElementById('toast-message');
-    const successIcon = document.getElementById('toast-success');
-    const errorIcon = document.getElementById('toast-error');
-    
-    if (!toast || !toastMessage || !successIcon || !errorIcon) {
-        console.error('Toast elements not found');
-        return;
-    }
-    
-    // Set message
-    toastMessage.textContent = message;
-    
-    // Show correct icon
-    successIcon.classList.add('hidden');
-    errorIcon.classList.add('hidden');
-    
-    if (type === 'success') {
-        successIcon.classList.remove('hidden');
-    } else if (type === 'error') {
-        errorIcon.classList.remove('hidden');
-    }
-    
-    // Show toast
-    toast.classList.remove('translate-x-full', 'opacity-0');
-    
-    // Hide toast after 3 seconds
-    setTimeout(() => {
-        toast.classList.add('translate-x-full', 'opacity-0');
-    }, 3000);
-}
-
-// Add event listeners for size selection
-document.addEventListener('DOMContentLoaded', () => {
-    Cart.init();
-    
-    // Hide error message when a size is selected
-    const sizeInputs = document.querySelectorAll('input[name="size"]');
-    const sizeError = document.querySelector('#size-error');
-    
-    sizeInputs.forEach(input => {
-        input.addEventListener('change', () => {
-            sizeError.classList.add('hidden');
-        });
-    });
-});
-
-const updateCartCount = async (count) => {
-    const cartCount = document.getElementById('cartCount');
-    if (cartCount) {
-        cartCount.textContent = count;
-        
-        // Điều chỉnh kích thước cho số có nhiều chữ số
-        if (count > 99) {
-            cartCount.textContent = '99+';
-            cartCount.classList.add('w-6');
-        } else {
-            cartCount.classList.remove('w-6');
-        }
-    }
-};
-
-const updateCartQuantity = async (itemId, quantity) => {
-    console.log('Updating cart with ID:', itemId, 'Quantity:', quantity);
-    
-    try {
-        if (!itemId) {
-            throw new Error('Item ID is required');
-        }
-
-        // Thêm size vào request body
-        const cartItem = document.querySelector(`[data-cart-item="${itemId}"]`);
-        const size = cartItem?.dataset.size;
-
+    async _sendUpdateQuantityRequest(itemId, quantity, size) {
         const response = await fetch(`/cart/update/${itemId}`, {
             method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-                quantity,
-                size,
-                product_id: itemId // Thêm product_id cho guest users
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ quantity, size, product_id: itemId })
         });
 
         if (!response.ok) {
@@ -190,32 +188,16 @@ const updateCartQuantity = async (itemId, quantity) => {
         if (data.success) {
             updateCartCount(data.cart.total_items);
             showNotification('Cart updated successfully', 'success');
-            
-            setTimeout(() => {
-                window.location.reload();
-            }, 500);
+            setTimeout(() => window.location.reload(), 500);
         } else {
             throw new Error(data.message || 'Failed to update cart');
         }
-    } catch (error) {
-        console.error('Error:', error);
-        showNotification(error.message || 'Failed to update cart', 'error');
-    }
-};
+    },
 
-const removeCartItem = async (itemId) => {
-    console.log('Removing item with ID:', itemId);
-    
-    try {
-        if (!itemId) {
-            throw new Error('Item ID is required');
-        }
-
+    async _sendRemoveItemRequest(itemId) {
         const response = await fetch(`/cart/remove/${itemId}`, {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            }
+            headers: { 'Content-Type': 'application/json' }
         });
 
         if (!response.ok) {
@@ -228,20 +210,78 @@ const removeCartItem = async (itemId) => {
         if (data.success) {
             updateCartCount(data.cart.total_items);
             showNotification('Item removed from cart', 'success');
-            
-            setTimeout(() => {
-                window.location.reload();
-            }, 500);
+            setTimeout(() => window.location.reload(), 500);
         } else {
             throw new Error(data.message || 'Failed to remove item');
         }
-    } catch (error) {
-        console.error('Error:', error);
-        showNotification(error.message || 'Failed to remove item', 'error');
     }
 };
 
+/**
+ * Notification Functions
+ */
+function showNotification(message, type = 'success') {
+    const elements = {
+        toast: document.getElementById('toast'),
+        message: document.getElementById('toast-message'),
+        successIcon: document.getElementById('toast-success'),
+        errorIcon: document.getElementById('toast-error')
+    };
+
+    if (!_validateToastElements(elements)) return;
+
+    _updateToastContent(elements, message, type);
+    _showToast(elements.toast);
+}
+
+function _validateToastElements(elements) {
+    if (!elements.toast || !elements.message || !elements.successIcon || !elements.errorIcon) {
+        console.error('Toast elements not found');
+        return false;
+    }
+    return true;
+}
+
+function _updateToastContent(elements, message, type) {
+    elements.message.textContent = message;
+    elements.successIcon.classList.add('hidden');
+    elements.errorIcon.classList.add('hidden');
+    
+    if (type === 'success') {
+        elements.successIcon.classList.remove('hidden');
+    } else if (type === 'error') {
+        elements.errorIcon.classList.remove('hidden');
+    }
+}
+
+function _showToast(toastElement) {
+    toastElement.classList.remove('translate-x-full', 'opacity-0');
+    setTimeout(() => {
+        toastElement.classList.add('translate-x-full', 'opacity-0');
+    }, 3000);
+}
+
+/**
+ * Event Listeners
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    Cart.init();
+    _initializeSizeSelection();
+});
+
+function _initializeSizeSelection() {
+    const sizeInputs = document.querySelectorAll('input[name="size"]');
+    const sizeError = document.querySelector('#size-error');
+    
+    sizeInputs.forEach(input => {
+        input.addEventListener('change', () => {
+            sizeError.classList.add('hidden');
+        });
+    });
+}
+
 // Export functions to window object
-window.updateCartCount = updateCartCount;
-window.updateCartQuantity = updateCartQuantity;
-window.removeCartItem = removeCartItem;
+window.updateCartCount = Cart.updateCartCount.bind(Cart);
+window.updateCartQuantity = CartUI.updateCartQuantity.bind(CartUI);
+window.removeCartItem = CartUI.removeCartItem.bind(CartUI);
+window.addToCart = CartUI.addToCart.bind(CartUI);
