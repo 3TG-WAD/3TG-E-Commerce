@@ -39,22 +39,14 @@ const manufacturers = [
     }
 ];
 
-async function seedManufacturers() {
+async function seedManufacturers(connection) {
     try {
-        await mongoose.connect('mongodb://localhost:27017/ecommerce');
-        console.log('Connected to MongoDB');
-        // Xóa dữ liệu cũ
         await Manufacturer.deleteMany({});
-        
-        // Thêm dữ liệu mới
         await Manufacturer.insertMany(manufacturers);
-        
         console.log('Manufacturers seeded successfully');
-        process.exit(0);
     } catch (error) {
-        console.error('Error seeding manufacturers:', error);
-        process.exit(1);
+        throw error;
     }
 }
 
-seedManufacturers(); 
+module.exports = seedManufacturers; 

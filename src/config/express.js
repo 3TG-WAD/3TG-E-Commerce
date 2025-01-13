@@ -128,12 +128,19 @@ const configureExpress = (app) => {
       title: '404 - Page Not Found'
     });
   });
-
+  
   // 500 handler
   app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).render('error/500', {
       title: '500 - Server Error'
+    });
+  });
+
+  // 403 handler
+  app.use((req, res, next) => {
+    res.status(403).render('error/403', {
+      title: '403 - Forbidden'
     });
   });
 };

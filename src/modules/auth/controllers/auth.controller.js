@@ -144,3 +144,46 @@ exports.googleCallback = (req, res) => {
   req.flash('success', 'Successfully logged in with Google!');
   res.redirect('/');
 };
+
+exports.checkUsername = async (req, res) => {
+    try {
+        const { username } = req.body;
+        
+        // Validate format
+        const usernameRegex = /^[a-zA-Z][a-zA-Z0-9_]{5,}$/;
+        if (!usernameRegex.test(username)) {
+            return res.json({
+                available: false,
+                message: 'Username must start with a letter, minimum 6 characters, and can only contain letters, numbers and underscores'
+            });
+        }
+
+        // Check availability
+        const existingUser = await User.findOne({ username });
+        res.json({
+            available: !existingUser,
+            message: existingUser ? 'Username already exists' : 'Username is available'
+        });
+    } catch (error) {
+        res.status(500).json({
+            available: false,
+            message: 'Failed to check username'
+        });
+    }
+};
+
+exports.checkEmail = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const existingUser = await User.findOne({ email });
+        res.json({
+            available: !existingUser,
+            message: existingUser ? 'Email already exists' : 'Email is available'
+        });
+    } catch (error) {
+        res.status(500).json({
+            available: false,
+            message: 'Failed to check email'
+        });
+    }
+};

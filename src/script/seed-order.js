@@ -1,18 +1,4 @@
-const mongoose = require('mongoose');
 const Order = require('../modules/order/models/order');
-
-// Kết nối database với xử lý lỗi
-mongoose.connect("mongodb://localhost:27017/ecommerce", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => {
-    console.log("Connected to MongoDB successfully");
-}).catch((err) => {
-    console.error("MongoDB connection error:", err);
-    process.exit(1);
-});
-
-const USER_ID = "677f646e4046cae2e98c9e80";
 
 // Dữ liệu mẫu
 const sampleOrders = [
@@ -98,25 +84,14 @@ const sampleOrders = [
     }
 ];
 
-// Hàm seed data
-const seedOrders = async () => {
+async function seedOrders(connection) {
     try {
-        // Xóa dữ liệu cũ
         await Order.deleteMany({});
-        
-        // Thêm dữ liệu mới
         const result = await Order.insertMany(sampleOrders);
-        
         console.log(`Đã thêm thành công ${result.length} đơn hàng mẫu`);
-        
-        // Đóng kết nối
-        mongoose.connection.close();
     } catch (error) {
-        console.error("Error seeding orders:", error);
-        mongoose.connection.close();
-        process.exit(1);
+        throw error;
     }
-};
+}
 
-// Chạy seed
-seedOrders();
+module.exports = seedOrders;
