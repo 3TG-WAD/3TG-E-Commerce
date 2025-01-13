@@ -70,6 +70,7 @@ class PaymentService {
           discount: item.discount
         })),
         shipping_address: user.address || "Have not updated",
+        phone_number: user.phone || "Have not updated",
         payment_method: "PayOS",
         status: "pending",
         total_amount: cart.total_price,

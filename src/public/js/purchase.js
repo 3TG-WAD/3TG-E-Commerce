@@ -268,10 +268,7 @@ const loadOrders = async (status = 'all') => {
                                 <span>Payment Method</span>
                                 <span class="font-medium">${order.payment_method}</span>
                             </div>
-                            <div class="flex justify-between items-center text-sm text-gray-500">
-                                <span>Shipping Address</span>
-                                <span class="font-medium">${order.shipping_address}</span>
-                            </div>
+                            
                         </div>
                         
                         ${order.status === 'pending' ? `

@@ -131,6 +131,21 @@
             </button>
           </div>
   
+          <!-- Form số điện thoại -->
+          <div class="mb-4">
+            <label for="phone" class="block text-sm font-medium text-gray-700">Số điện thoại</label>
+            <input 
+              type="tel" 
+              id="phone" 
+              name="phone"
+              pattern="[0-9]{10}"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
+              placeholder="Nhập số điện thoại của bạn"
+              required
+            >
+            <p class="mt-1 text-sm text-gray-500">Vui lòng nhập số điện thoại để chúng tôi có thể liên hệ khi giao hàng</p>
+          </div>
+  
           <!-- Checkout Button -->
           <div class="w-full">
             <button id="paymentButton" 
@@ -192,12 +207,19 @@
       paymentButton.addEventListener('click', async function() {
         console.log('Payment button clicked'); // Debug log
         
+        const phone = document.getElementById('phone').value;
+        if (!phone) {
+          showNotification('Vui lòng nhập số điện thoại', 'error');
+          return;
+        }
+
         try {
           const response = await fetch('/payment/create', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
-            }
+            },
+            body: JSON.stringify({ phone })
           });
 
           console.log('Payment response:', response); // Debug log
@@ -263,3 +285,61 @@
     }, 3000);
   }
   </script>
+
+  <script>
+document.getElementById('paymentButton').addEventListener('click', async () => {
+  const phoneInput = document.getElementById('phone');
+  const phone = phoneInput.value.trim();
+
+  console.log('Phone value:', phone); // Debug log
+
+  // Validate số điện thoại với regex
+  const phoneRegex = /^[0-9]{10}$/;
+  if (!phone || !phoneRegex.test(phone)) {
+    showNotification('Vui lòng nhập số điện thoại hợp lệ (10 số)', 'error');
+    phoneInput.focus();
+    return;
+  }
+
+  try {
+    // Tạo FormData object
+    const formData = new FormData();
+    formData.append('phone', phone);
+
+    const response = await fetch('/payment/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        phone: phone // Đảm bảo gửi đúng format
+      })
+    });
+
+    console.log('Request sent with phone:', phone); // Debug log
+
+    const data = await response.json();
+    console.log('Payment response:', data); // Debug log
+
+    if (data.success) {
+      window.location.href = data.paymentUrl;
+    } else {
+      showNotification(data.message || 'Có lỗi xảy ra khi tạo thanh toán', 'error');
+    }
+  } catch (error) {
+    console.error('Payment error:', error);
+    showNotification('Có lỗi xảy ra khi tạo thanh toán', 'error');
+  }
+});
+
+// Thêm validate khi nhập
+document.getElementById('phone').addEventListener('input', function(e) {
+  // Chỉ cho phép nhập số
+  this.value = this.value.replace(/[^0-9]/g, '');
+  
+  // Giới hạn 10 số
+  if (this.value.length > 10) {
+    this.value = this.value.slice(0, 10);
+  }
+});
+</script>

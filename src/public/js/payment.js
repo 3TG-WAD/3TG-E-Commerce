@@ -1,7 +1,7 @@
 console.log('Payment.js loaded');
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded in payment.js');
+    console.log('DOM Content Loaded');
     
     const paymentButton = document.getElementById('paymentButton');
     console.log('Payment button:', paymentButton);
@@ -10,12 +10,19 @@ document.addEventListener('DOMContentLoaded', function() {
         paymentButton.addEventListener('click', async function() {
             console.log('Payment button clicked');
             
+            const phone = document.getElementById('phone').value;
+            if (!phone) {
+                showNotification('Vui lòng nhập số điện thoại', 'error');
+                return;
+            }
+
             try {
                 const response = await fetch('/payment/create', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    body: JSON.stringify({ phone })
                 });
 
                 console.log('Payment response:', response);
@@ -25,11 +32,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     window.location.href = data.paymentUrl;
                 } else {
-                    showNotification(data.message || 'Payment failed', 'error');
+                    showNotification(data.message || 'Có lỗi xảy ra khi tạo thanh toán', 'error');
                 }
             } catch (error) {
                 console.error('Payment error:', error);
-                showNotification('Payment failed', 'error');
+                showNotification('Có lỗi xảy ra khi tạo thanh toán', 'error');
             }
         });
     } else {
