@@ -7,7 +7,13 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     trim: true,
-    minlength: 3,
+    minlength: 6,
+    validate: {
+        validator: function(v) {
+            return /^[a-zA-Z][a-zA-Z0-9_]*$/.test(v) && !/\s/.test(v);
+        },
+        message: 'Username must start with a letter and can only contain letters, numbers, and underscores.'
+    }
   },
   email: {
     type: String,

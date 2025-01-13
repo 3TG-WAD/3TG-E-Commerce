@@ -17,7 +17,12 @@ class AuthService {
         throw new Error('Email already exists');
     }
 
-    // If both checks pass, create new user
+    // Validate password match
+    if (userData.password !== userData.confirmPassword) {
+        throw new Error('Passwords do not match');
+    }
+
+    // If all checks pass, create new user
     const user = new User({
         username: userData.username,
         email: userData.email,

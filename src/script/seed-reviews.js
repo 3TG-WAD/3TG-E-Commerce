@@ -291,50 +291,14 @@ const reviews = [
   },
 ];
 
-async function seed() {
+async function seedReviews(connection) {
     try {
-        // Kết nối MongoDB khi chạy riêng file này
-        if (!mongoose.connection.readyState) {
-            await mongoose.connect('mongodb://localhost:27017/ecommerce');
-            console.log('Connected to MongoDB');
-        }
-
-        // Xóa reviews cũ
         await Review.deleteMany({});
-        
-        // Xóa index cũ nếu tồn tại
-        try {
-            await Review.collection.dropIndex('product_id_1');
-            console.log('Old index dropped successfully');
-        } catch (error) {
-            console.log('No old index to drop');
-        }
-
-        // Insert reviews mới
-        const result = await Review.insertMany(reviews);
-        console.log('Reviews seeded successfully:', result.length);
-
-        // Đóng kết nối nếu chạy riêng file này
-        if (process.argv[1].includes('seed-reviews.js')) {
-            await mongoose.disconnect();
-        }
+        await Review.insertMany(reviews);
+        console.log('Reviews inserted successfully!');
     } catch (error) {
-        console.error('Error seeding reviews:', error);
         throw error;
     }
 }
 
-// Tự chạy nếu gọi trực tiếp file này
-if (require.main === module) {
-    seed()
-        .then(() => {
-            console.log('Seeding completed');
-            process.exit(0);
-        })
-        .catch(error => {
-            console.error('Seeding failed:', error);
-            process.exit(1);
-        });
-} else {
-    module.exports = seed;
-}
+module.exports = seedReviews;

@@ -15,9 +15,10 @@ const seedFiles = [
 ];
 
 async function runSeedFiles() {
+    let connection;
     try {
-        // Kết nối MongoDB
-        await mongoose.connect(MONGODB_URI);
+        // Kết nối MongoDB một lần duy nhất
+        connection = await mongoose.connect(MONGODB_URI);
         console.log('Connected to MongoDB');
 
         // Chạy từng file seed tuần tự
@@ -26,8 +27,14 @@ async function runSeedFiles() {
             const filePath = path.join(__dirname, file);
             
             try {
-                // Sử dụng require để chạy file trực tiếp
-                await require(filePath);
+                // Truyền connection vào mỗi file seed
+                const seedFunction = require(filePath);
+                // Kiểm tra xem export có phải là function không
+                if (typeof seedFunction === 'function') {
+                    await seedFunction(connection);
+                } else {
+                    await seedFunction.default?.(connection);
+                }
                 console.log(`✓ ${file} completed successfully`);
             } catch (error) {
                 console.error(`✗ Error in ${file}:`, error);
@@ -38,8 +45,10 @@ async function runSeedFiles() {
         console.error('Database connection error:', error);
     } finally {
         // Đóng kết nối
-        await mongoose.connection.close();
-        console.log('\nDatabase seeding completed');
+        if (connection) {
+            await mongoose.connection.close();
+            console.log('\nDatabase seeding completed');
+        }
         process.exit(0);
     }
 }
