@@ -138,11 +138,11 @@ class ProductController {
 
     _getReviewData = async (productId, options = {}) => {
         const page = options.review_page || 1;
-        const limit = 10;
+        const limit = 5;
         const skip = (page - 1) * limit;
 
         const reviews = await Review.find({ product_id: productId })
-            .populate('user_id', 'email')
+            .populate('user_id', 'username email avatar')
             .sort({ created_at: -1 })
             .skip(skip)
             .limit(limit);
@@ -151,16 +151,18 @@ class ProductController {
 
         const formattedReviews = reviews.map(review => ({
             ...review.toObject(),
-            user_name: review.user_id?.email || 'Anonymous',
+            user_name: review.user_id?.username || review.user_id?.email || 'Anonymous',
+            user_avatar: review.user_id?.avatar,
             rating: review.rating,
             comment: review.comment,
+            photos: review.photos || [],
             created_at: review.created_at
         }));
 
         return {
             reviews: {
                 items: formattedReviews,
-                currentPage: page,
+                currentPage: parseInt(page),
                 totalPages: Math.ceil(totalReviews / limit),
                 totalReviews
             }
@@ -265,6 +267,38 @@ class ProductController {
         });
     }
 
+    uploadImages = async (req, res) => {
+        try {
+            console.log('Starting image upload process...');
+            
+            if (!req.files || req.files.length === 0) {
+                console.log('No files were uploaded');
+                return res.status(400).json({ 
+                    success: false, 
+                    message: 'No files were uploaded' 
+                });
+            }
+
+            // Sửa lại cách gọi s3Service
+            const uploadPromises = req.files.map(file => s3Service.uploadFile(file, 'reviews'));
+            const urls = await Promise.all(uploadPromises);
+            
+            console.log('Upload successful, URLs:', urls);
+
+            res.json({
+                success: true,
+                urls: urls // URLs sẽ là array các string
+            });
+
+        } catch (error) {
+            console.error('Error in uploadImages:', error);
+            res.status(500).json({
+                success: false,
+                message: error.message || 'Error uploading images'
+            });
+        }
+    }
+
     addReview = async (req, res) => {
         try {
             console.log('Adding review...');
@@ -272,7 +306,7 @@ class ProductController {
             console.log('Body:', req.body);
             
             const { id } = req.params;
-            const { rating, comment } = req.body;
+            const { rating, comment, photos } = req.body;
 
             // Validate input
             if (!rating || !comment) {
@@ -291,13 +325,14 @@ class ProductController {
                 });
             }
 
-            // Create review
+            // Create review with photos
             const review = await Review.create({
                 product_id: id,
                 user_id: req.user._id,
                 rating: ratingNum,
                 comment: comment.trim(),
-                created_at: new Date()
+                created_at: new Date(),
+                photos: photos || [] // Add photos array from S3 URLs
             });
 
             // Populate user info
@@ -310,7 +345,8 @@ class ProductController {
                     rating: review.rating,
                     comment: review.comment,
                     created_at: review.created_at,
-                    user_name: review.user_id?.email || 'Anonymous'
+                    user_name: review.user_id?.email || 'Anonymous',
+                    photos: review.photos
                 }
             });
 

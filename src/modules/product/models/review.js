@@ -9,9 +9,7 @@ const reviewSchema = new mongoose.Schema({
   },
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
-    // No need to ref to user model
-    // required: true,
-    // ref: 'User',
+    ref: 'User',
   },
   rating: {
     type: Number,
@@ -23,6 +21,9 @@ const reviewSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  photos: [{
+    type: String,
+  }],
   created_at: {
     type: Date,
     default: Date.now,
@@ -30,10 +31,7 @@ const reviewSchema = new mongoose.Schema({
   updated_at: {
     type: Date,
     default: Date.now,
-  },
-  photos: [{
-    type: String
-  }],
+  }
 });
 
 const Review = mongoose.model("Review", reviewSchema);

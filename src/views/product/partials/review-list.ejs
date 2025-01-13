@@ -21,6 +21,17 @@
                 <p class="text-gray-600 mb-2">
                     "<%= review.comment %>"
                 </p>
+                <% if (review.photos && review.photos.length > 0) { %>
+                    <div class="flex gap-2 my-3">
+                        <% review.photos.forEach(photo => { %>
+                            <div class="w-20 h-20 rounded-lg overflow-hidden">
+                                <img src="<%= photo %>" 
+                                     alt="Review photo" 
+                                     class="w-full h-full object-cover">
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } %>
                 <span class="text-sm text-gray-500">Posted on <%= new Date(review.created_at).toLocaleDateString() %></span>
             </div>
         </div>
