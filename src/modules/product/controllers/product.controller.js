@@ -3,6 +3,22 @@ const Manufacturer = require('../models/manufacturer');
 const Category = require('../models/category');
 const Variant = require('../models/variant');
 const Review = require('../models/review');
+const multer = require('multer');
+const s3Service = require('../../s3/services/s3.service');
+
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB limit
+    },
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Not an image! Please upload an image.'), false);
+        }
+    },
+});
 
 class ProductController {
     formatSpecKey = (key) => {
@@ -31,11 +47,12 @@ class ProductController {
             }
 
             res.render('product/index', {
-                title: `${productData.product.product_name} - SixT Store`,
+                title: `${productData.product.name} - SixT Store`,
                 ...productData,
                 ...reviewData,
                 ...recommendedData,
                 user: req.user || null,
+                isLoggedIn: !!req.user,
                 formatToVND,
                 formatSpecKey: this.formatSpecKey
             });
@@ -119,32 +136,30 @@ class ProductController {
         };
     }
 
-    _getReviewData = async (productId, query) => {
-        const page = parseInt(query.review_page) || 1;
-        const limit = 3;
+    _getReviewData = async (productId, options = {}) => {
+        const page = options.review_page || 1;
+        const limit = 10;
         const skip = (page - 1) * limit;
 
-        const [reviews, totalReviews] = await Promise.all([
-            Review.aggregate([
-                { $match: { product_id: productId } },
-                { $sort: { created_at: -1 } },
-                { $skip: skip },
-                { $limit: limit },
-                {
-                    $project: {
-                        rating: 1,
-                        comment: 1,
-                        created_at: 1,
-                        user_name: "Anonymous User"
-                    }
-                }
-            ]),
-            Review.countDocuments({ product_id: productId })
-        ]);
+        const reviews = await Review.find({ product_id: productId })
+            .populate('user_id', 'email')
+            .sort({ created_at: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const totalReviews = await Review.countDocuments({ product_id: productId });
+
+        const formattedReviews = reviews.map(review => ({
+            ...review.toObject(),
+            user_name: review.user_id?.email || 'Anonymous',
+            rating: review.rating,
+            comment: review.comment,
+            created_at: review.created_at
+        }));
 
         return {
             reviews: {
-                items: reviews,
+                items: formattedReviews,
                 currentPage: page,
                 totalPages: Math.ceil(totalReviews / limit),
                 totalReviews
@@ -248,6 +263,64 @@ class ProductController {
             }
             return res.json({ success: true, html });
         });
+    }
+
+    addReview = async (req, res) => {
+        try {
+            console.log('Adding review...');
+            console.log('User:', req.user);
+            console.log('Body:', req.body);
+            
+            const { id } = req.params;
+            const { rating, comment } = req.body;
+
+            // Validate input
+            if (!rating || !comment) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Rating and comment are required'
+                });
+            }
+
+            // Ensure rating is a number between 1-5
+            const ratingNum = parseInt(rating);
+            if (isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Rating must be between 1 and 5'
+                });
+            }
+
+            // Create review
+            const review = await Review.create({
+                product_id: id,
+                user_id: req.user._id,
+                rating: ratingNum,
+                comment: comment.trim(),
+                created_at: new Date()
+            });
+
+            // Populate user info
+            await review.populate('user_id', 'email');
+
+            // Send response
+            res.json({
+                success: true,
+                review: {
+                    rating: review.rating,
+                    comment: review.comment,
+                    created_at: review.created_at,
+                    user_name: review.user_id?.email || 'Anonymous'
+                }
+            });
+
+        } catch (error) {
+            console.error('Error adding review:', error);
+            res.status(500).json({
+                success: false,
+                message: error.message || 'Error adding review'
+            });
+        }
     }
 }
 
