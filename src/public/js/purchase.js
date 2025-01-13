@@ -223,7 +223,8 @@ const loadOrders = async (status = 'all') => {
                     <img src="/images/orders/empty-order.png" alt="No Orders" class="w-32 h-32 mx-auto mb-6 opacity-75">
                     <h3 class="text-xl font-semibold text-gray-900 mb-2">No Orders Found</h3>
                     <p class="text-gray-500">Start shopping to create your first order</p>
-                    <a href="/shop" class="inline-block mt-6 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <br/>
+                    <a href="/categories/all" class="inline-block mt-6 px-6 py-3 bg-black text-white rounded-lg transition-colors">
                         Browse Products
                     </a>
                 </div>

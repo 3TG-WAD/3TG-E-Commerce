@@ -47,6 +47,14 @@ class AuthService {
           if (err) return reject(err);
           resolve(user);
         });
+
+        // Lưu user vào session
+        req.session.user = {
+            _id: user._id,
+            email: user.email,
+            username: user.username
+        };
+        console.log('User saved to session:', req.session.user); // Debug log
       })(req, res, next);
     });
   }
@@ -124,31 +132,39 @@ class AuthService {
   }
   async handleGoogleAuth(profile) {
     try {
-      let user = await User.findOne({ email: profile.emails[0].value });
-      
-      if (!user) {
-        // Tạo user mới nếu chưa tồn tại
-        user = await User.create({
-          username: profile.displayName,
-          email: profile.emails[0].value,
-          password: crypto.randomBytes(16).toString('hex'),
-          isActive: true,
-          authProvider: 'google',
-          googleId: profile.id,
-          avatar: profile.photos[0]?.value || null
-        });
-      } else if (!user.googleId) {
-        // Cập nhật thông tin Google nếu user đã tồn tại
-        user.googleId = profile.id;
-        user.authProvider = 'google';
-        user.avatar = profile.photos[0]?.value || user.avatar;
-        await user.save();
-      }
+        console.log('Handling Google auth for email:', profile.emails[0].value);
+        
+        let user = await User.findOne({ email: profile.emails[0].value });
+        console.log('Existing user found:', user?._id);
+        
+        if (!user) {
+            console.log('Creating new user for Google auth');
+            // Tạo user mới nếu chưa tồn tại
+            user = await User.create({
+                username: profile.displayName,
+                email: profile.emails[0].value,
+                password: crypto.randomBytes(16).toString('hex'),
+                isActive: true,
+                authProvider: 'google',
+                googleId: profile.id,
+                avatar: profile.photos[0]?.value || null
+            });
+            console.log('New user created:', user._id);
+        } else if (!user.googleId) {
+            console.log('Updating existing user with Google info');
+            // Cập nhật thông tin Google nếu user đã tồn tại
+            user.googleId = profile.id;
+            user.authProvider = 'google';
+            user.avatar = profile.photos[0]?.value || user.avatar;
+            await user.save();
+            console.log('User updated with Google info');
+        }
 
-      return user;
+        return user;
     } catch (error) {
-      console.error('Handle Google auth error:', error);
-      throw new Error('Failed to process Google authentication');
+        console.error('Handle Google auth error:', error);
+        console.error('Error details:', error.stack);
+        throw new Error('Failed to process Google authentication');
     }
   }
 }

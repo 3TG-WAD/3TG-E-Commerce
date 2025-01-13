@@ -6,7 +6,7 @@
       <span class="text-gray-900">Cart</span>
     </nav>
   
-    <h1 class="text-2xl font-bold mb-8">YOUR CART</h1>
+    <h1 class="text-2xl font-bold mb-8">Your Cart</h1>
   
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Cart Items -->
@@ -14,32 +14,44 @@
         <% if (cartItems && cartItems.length > 0) { %>
           <div class="space-y-6">
             <% cartItems.forEach(item => { %>
-              <div class="flex items-center gap-6 pb-6 border-b border-gray-200">
+              <!-- Debug info -->
+              <script>
+                  console.log('Cart Item:', {
+                      item: '<%= JSON.stringify(item) %>',
+                      hasId: '<%= !!item._id %>',
+                      id: '<%= item._id %>',
+                      product: '<%= item.product_id %>',
+                      quantity: '<%= item.quantity %>'
+                  });
+              </script>
+              
+              <div class="flex items-center gap-6 pb-6 border-b border-gray-200" 
+                   data-cart-item="<%= item.id %>" 
+                   data-size="<%= item.size %>">
                 <!-- Product Image -->
                 <div class="w-24 h-24 flex-shrink-0">
-                  <img src="<%= item.product.photos[0] %>" 
-                       alt="<%= item.product.product_name %>" 
+                  <img src="<%= item.product.images?.[0] || '/images/placeholder.jpg' %>" 
+                       alt="<%= item.product.name %>" 
                        class="w-full h-full object-cover">
                 </div>
   
                 <!-- Product Details -->
                 <div class="flex-1">
-                  <h3 class="font-medium mb-1"><%= item.product.product_name %></h3>
+                  <h3 class="font-medium mb-1"><%= item.product.name %></h3>
                   <div class="text-sm text-gray-500 space-y-1">
-                    <p>Size: <%= item.size %></p>
-                    <p>Color: <%= item.color %></p>
+                    <p>Size: <%= item.size || 'N/A' %></p>
                   </div>
                 </div>
   
                 <!-- Quantity Controls -->
                 <div class="flex items-center gap-3">
                   <button class="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md"
-                          onclick="updateQuantity('<%= item._id %>', -1)">
+                          onclick="updateCartQuantity('<%= item.id %>', '<%= item.quantity - 1 %>')">
                     -
                   </button>
                   <span class="w-8 text-center"><%= item.quantity %></span>
                   <button class="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md"
-                          onclick="updateQuantity('<%= item._id %>', 1)">
+                          onclick="updateCartQuantity('<%= item.id %>', '<%= item.quantity + 1 %>')">
                     +
                   </button>
                 </div>
@@ -58,7 +70,7 @@
   
                 <!-- Remove Button -->
                 <button class="text-red-500 hover:text-red-600"
-                        onclick="removeItem('<%= item._id %>')">
+                        onclick="removeCartItem('<%= item.id %>')">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                   </svg>
@@ -84,10 +96,10 @@
           <div class="space-y-3 mb-6">
             <div class="flex justify-between">
               <span class="text-gray-600">Subtotal</span>
-              <span class="font-medium"><%= formatToVND(cart.total_price) %></span>
+              <span class="font-medium"><%= formatToVND(total_price) %></span>
             </div>
             
-            <% if (discount) { %>
+            <% if (typeof discount !== 'undefined' && discount > 0) { %>
               <div class="flex justify-between text-red-500">
                 <span>Discount (<%= discount %>%)</span>
                 <span>-<%= formatToVND(cart.total_price * discount / 100) %></span>
@@ -102,7 +114,7 @@
             <div class="border-t border-gray-200 pt-3 flex justify-between">
               <span class="font-medium">Total</span>
               <span class="font-medium">
-                <%= formatToVND(cart.total_price * (1 - discount/100) + 15000) %>
+                <%= formatToVND(total_price * (1 - (discount || 0)/100) + 15000) %>
               </span>
             </div>
           </div>
@@ -130,14 +142,14 @@
   </div>
   
   <script>
-  async function updateQuantity(itemId, change) {
+  async function updateQuantity(itemId, change, size) {
     try {
       const response = await fetch(`/cart/update/${itemId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ change })
+        body: JSON.stringify({ change, size })
       });
       
       if (response.ok) {
@@ -148,12 +160,16 @@
     }
   }
   
-  async function removeItem(itemId) {
+  async function removeItem(itemId, size) {
     if (!confirm('Are you sure you want to remove this item?')) return;
     
     try {
       const response = await fetch(`/cart/remove/${itemId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ size })
       });
       
       if (response.ok) {
@@ -164,3 +180,19 @@
     }
   }
   </script>
+  
+  <div id="toast" class="fixed top-4 right-4 z-50 transform transition-all duration-300 translate-x-full opacity-0">
+    <div class="flex items-center p-4 bg-white border rounded-lg shadow-lg min-w-[300px]">
+        <div class="mr-3 hidden" id="toast-success">
+            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+        </div>
+        <div class="mr-3 hidden" id="toast-error">
+            <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+            </svg>
+        </div>
+        <p id="toast-message" class="text-sm text-gray-800"></p>
+    </div>
+  </div>

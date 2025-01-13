@@ -49,15 +49,47 @@
                 <div class="text-gray-600"><%= product.color %></div>
             </div>
 
+            <!-- Size -->
+            <div class="mb-6">
+                <h3 class="font-medium mb-2">Size</h3>
+                <div class="flex flex-wrap gap-3" id="sizeSelector">
+                    <% const sizes = Array.from({length: 8}, (_, i) => i + 6) %>
+                    <% sizes.forEach(size => { %>
+                        <label class="relative">
+                            <input type="radio" 
+                                   name="size" 
+                                   value="<%= size %>" 
+                                   class="peer sr-only"
+                                   required>
+                            <span class="flex items-center justify-center w-16 h-10 border-2 border-gray-200 
+                                       rounded-lg text-sm cursor-pointer select-none
+                                       transition-all duration-200 ease-out
+                                       hover:border-gray-400 
+                                       peer-checked:border-black peer-checked:bg-black peer-checked:text-white
+                                       peer-checked:scale-[1.05] peer-checked:shadow-md
+                                       peer-focus:ring-2 peer-focus:ring-black peer-focus:ring-offset-2
+                                       active:scale-95">
+                                US <%= size %>
+                            </span>
+                        </label>
+                    <% }) %>
+                </div>
+                <p class="mt-2 text-sm text-red-600 hidden" id="size-error">Please select a size</p>
+            </div>
+
             <!-- Add to Cart -->
             <div class="flex items-center gap-4 mb-8">
                 <div class="flex items-center">
                     <input type="number" 
+                           id="quantity"
                            value="1" 
                            min="1"
                            class="w-20 px-3 py-2 border rounded focus:outline-none focus:border-gray-500">
                 </div>
-                <button class="flex-1 bg-gray-900 text-white py-2 rounded hover:bg-gray-800">
+                <% const productId = product.id || product._id || product.product_id %>
+                <button onclick="addToCart('<%= productId %>')"
+                        data-product-id="<%= productId %>"
+                        class="flex-1 bg-gray-900 text-white py-2 rounded hover:bg-gray-800">
                     Add to Cart
                 </button>
             </div>
@@ -138,6 +170,21 @@
             </div>
         <% } %>
     </div>
-</div>
 
-<script src="/js/pagination.js" defer></script>
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 right-4 z-50 transform transition-all duration-300 translate-x-full opacity-0">
+        <div class="flex items-center p-4 bg-white border rounded-lg shadow-lg min-w-[300px]">
+            <div class="mr-3 hidden" id="toast-success">
+                <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <div class="mr-3 hidden" id="toast-error">
+                <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <p id="toast-message" class="text-sm text-gray-800"></p>
+        </div>
+    </div>
+</div>

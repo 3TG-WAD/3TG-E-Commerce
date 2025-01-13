@@ -4,7 +4,6 @@ const reviewSchema = new mongoose.Schema({
   product_id: {
     type: String,
     required: true,
-    unique: true,
     trim: true,
     ref: 'Product',
   },
@@ -13,7 +12,6 @@ const reviewSchema = new mongoose.Schema({
     // No need to ref to user model
     // required: true,
     // ref: 'User',
-    required: true,
   },
   rating: {
     type: Number,

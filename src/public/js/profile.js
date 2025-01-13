@@ -106,29 +106,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Disable form
                 exitEditMode();
                 
-                // Thông báo thành công
-                await Swal.fire({
-                    title: 'Success!',
-                    text: 'Profile updated successfully',
-                    icon: 'success',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#3B82F6',
-                });
-
+                showNotification('Profile updated successfully', 'success');
+                
                 // Reload page để cập nhật dữ liệu mới
-                window.location.reload();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
             } else {
                 throw new Error(result.message || 'Failed to update profile');
             }
         } catch (error) {
             console.error('Error:', error);
-            Swal.fire({
-                title: 'Error!',
-                text: error.message,
-                icon: 'error',
-                confirmButtonText: 'OK',
-                confirmButtonColor: '#EF4444',
-            });
+            showNotification(error.message, 'error');
         }
     });
 
@@ -188,13 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const file = this.files[0];
             if (!file.type.startsWith('image/')) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Please select an image file',
-                    icon: 'error',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#EF4444',
-                });
+                showNotification('Please select an image file', 'error');
                 return;
             }
 
@@ -203,50 +186,18 @@ document.addEventListener('DOMContentLoaded', function() {
             reader.onload = function(e) {
                 const preview = document.querySelector('img[alt="Profile Picture"]');
                 if (preview) {
-                    // Lưu URL ảnh cũ để khôi phục nếu cần
                     preview.dataset.oldSrc = preview.src;
                     preview.src = e.target.result;
                 }
             };
             reader.readAsDataURL(file);
 
-            // Show confirmation dialog
-            const result = await Swal.fire({
-                title: 'Update Avatar?',
-                text: 'Do you want to update your profile picture?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, update it!',
-                cancelButtonText: 'No, keep current',
-                confirmButtonColor: '#3B82F6',
-                cancelButtonColor: '#6B7280',
-            });
-
-            // If user cancels, restore old avatar
-            if (!result.isConfirmed) {
-                const preview = document.querySelector('img[alt="Profile Picture"]');
-                if (preview && preview.dataset.oldSrc) {
-                    preview.src = preview.dataset.oldSrc;
-                }
-                avatarInput.value = ''; // Reset file input
-                return;
-            }
-
-            // Show loading state
-            Swal.fire({
-                title: 'Uploading...',
-                text: 'Please wait while we upload your avatar',
-                allowOutsideClick: false,
-                showConfirmButton: false,
-                willOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
             const formData = new FormData();
             formData.append('avatar', file);
 
             try {
+                showNotification('Uploading avatar...', 'info');
+
                 const response = await fetch('/profile/update-avatar', {
                     method: 'POST',
                     body: formData
@@ -259,13 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const result = await response.json();
                 
                 if (result.success) {
-                    await Swal.fire({
-                        title: 'Success!',
-                        text: 'Avatar updated successfully',
-                        icon: 'success',
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: '#3B82F6',
-                    });
+                    showNotification('Avatar updated successfully', 'success');
                 } else {
                     throw new Error(result.message || 'Failed to update avatar');
                 }
@@ -276,16 +221,43 @@ document.addEventListener('DOMContentLoaded', function() {
                     preview.src = preview.dataset.oldSrc;
                 }
                 
-                Swal.fire({
-                    title: 'Error!',
-                    text: error.message,
-                    icon: 'error',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#EF4444',
-                });
+                showNotification(error.message, 'error');
             } finally {
                 avatarInput.value = ''; // Reset file input
             }
         });
     }
 });
+
+// Toast notification function
+function showNotification(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
+    const successIcon = document.getElementById('toast-success');
+    const errorIcon = document.getElementById('toast-error');
+    const infoIcon = document.getElementById('toast-info');
+    
+    // Set message
+    toastMessage.textContent = message;
+    
+    // Show correct icon
+    successIcon?.classList.add('hidden');
+    errorIcon?.classList.add('hidden');
+    infoIcon?.classList.add('hidden');
+    
+    if (type === 'success') {
+        successIcon?.classList.remove('hidden');
+    } else if (type === 'error') {
+        errorIcon?.classList.remove('hidden');
+    } else if (type === 'info') {
+        infoIcon?.classList.remove('hidden');
+    }
+    
+    // Show toast
+    toast?.classList.remove('translate-x-full', 'opacity-0');
+    
+    // Hide toast after 3 seconds
+    setTimeout(() => {
+        toast?.classList.add('translate-x-full', 'opacity-0');
+    }, 3000);
+}

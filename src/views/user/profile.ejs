@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile - WriteAce</title>
+    <title>My Profile - SixT Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="min-h-screen bg-gray-50/50">
     <div class="container mx-auto px-4 py-8">
@@ -22,13 +22,11 @@
                                      alt="Profile Picture" 
                                      class="w-full h-full object-cover rounded-full">
                             </div>
-                            <!-- Edit Avatar Button (Hidden by default) -->
                             <button type="button"
                                     id="changeAvatarBtn"
                                     class="hidden absolute inset-0 w-full h-full bg-black/50 rounded-full flex items-center justify-center text-white text-sm font-medium hover:bg-black/60 transition-all">
                                 <i class="fas fa-camera mr-1"></i>
                             </button>
-                            <!-- Disabled State Message -->
                             <div class="edit-hint absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 whitespace-nowrap opacity-0 transition-opacity">
                                 Click Edit to change avatar
                             </div>
@@ -117,7 +115,7 @@
                                 Cancel
                             </button>
                             <button type="submit" 
-                                    class="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600">
+                                    class="px-4 py-2 text-sm font-medium text-white bg-black rounded-lg hover:bg-black">
                                 Save Changes
                             </button>
                         </div>
@@ -129,40 +127,26 @@
 
     <input type="file" id="avatarInput" accept="image/*" class="hidden">
     
-    <!-- Add Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="/js/profile.js"></script>
-
-    <style>
-        /* Custom styles for disabled state */
-        .edit-hint {
-            transition: opacity 0.2s;
-        }
-        
-        .form-field-wrapper:hover .edit-hint {
-            opacity: 1;
-        }
-        
-        input[disabled], select[disabled], textarea[disabled] {
-            cursor: not-allowed;
-        }
-        
-        .group:hover .edit-hint {
-            opacity: 1;
-        }
-        
-        /* Custom styles for avatar hover */
-        .group:hover #changeAvatarBtn.hidden:not(.edit-mode) {
-            display: none !important;
-        }
-        
-        #changeAvatarBtn.edit-mode {
-            display: flex !important;
-        }
-        
-        .group:hover .edit-hint {
-            opacity: 1;
-        }
-    </style>
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 right-4 z-50 transform transition-all duration-300 translate-x-full opacity-0">
+        <div class="flex items-center p-4 bg-white border rounded-lg shadow-lg min-w-[300px]">
+            <div class="mr-3 hidden" id="toast-success">
+                <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <div class="mr-3 hidden" id="toast-error">
+                <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <div class="mr-3 hidden" id="toast-info">
+                <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v4a1 1 0 102 0V7zm-1 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <p id="toast-message" class="text-sm text-gray-800"></p>
+        </div>
+    </div>
 </body>
 </html>

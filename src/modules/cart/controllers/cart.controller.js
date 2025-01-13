@@ -1,68 +1,136 @@
-const cartController = {
-    getCartPage: async (req, res) => {
-        // Dữ liệu mẫu để demo UI
-        const cartItems = [
-            {
-                _id: '1',
-                product: {
-                    product_name: 'Gradient Graphic T-shirt',
-                    photos: ['/images/products/tshirt.jpg']
-                },
-                size: 'Large',
-                color: 'White',
-                quantity: 1,
-                price: 145000,
-                final_price: 145000,
-                discount: 0
-            },
-            {
-                _id: '2',
-                product: {
-                    product_name: 'Checkered Shirt',
-                    photos: ['/images/products/checkered.jpg']
-                },
-                size: 'Medium',
-                color: 'Red',
-                quantity: 1,
-                price: 180000,
-                final_price: 180000,
-                discount: 0
-            },
-            {
-                _id: '3',
-                product: {
-                    product_name: 'Skinny Fit Jeans',
-                    photos: ['/images/products/jeans.jpg']
-                },
-                size: 'Large',
-                color: 'Blue',
-                quantity: 1,
-                price: 240000,
-                final_price: 240000,
-                discount: 0
-            }
-        ];
+const cartService = require('../services/cart.service');
+const { formatToVND } = require('../../../helpers/currencyFormatter');
 
-        const cart = {
-            total_items: 3,
-            total_price: 565000 // 145000 + 180000 + 240000
-        };
+class CartController {
+    async getCartPage(req, res) {
+        try {
+            const userId = req.session?.passport?.user;
+            const { cartItems, total_price, total_items, discount } = 
+                await cartService.getCartData(userId, req.session.cartItems);
 
-        const discount = 20; // 20% discount
+            const formattedCartItems = cartItems.map(item => ({
+                id: item._id || item.product_id,
+                product: {
+                    name: item.product_name,
+                    images: item.photos || [],
+                },
+                quantity: item.quantity,
+                size: item.size,
+                price: item.price,
+                final_price: item.final_price,
+                discount: item.discount
+            }));
 
-        res.render('cart/index', {
-            title: 'Your Cart - SixT Store',
-            cartItems,
-            cart,
-            discount,
-            formatToVND: (price) => {
-                return new Intl.NumberFormat('vi-VN', {
-                    style: 'currency',
-                    currency: 'VND'
-                }).format(price);
-            }
-        });
+            res.render('cart/index', {
+                title: 'Shopping Cart',
+                cartItems: formattedCartItems,
+                total_price,
+                total_items,
+                discount,
+                formatToVND
+            });
+        } catch (error) {
+            console.error('Get cart error:', error);
+            res.status(500).render('error/500', {
+                title: '500 - Server Error'
+            });
+        }
     }
-};
 
-module.exports = cartController;
+    async addToCart(req, res) {
+        try {
+            const { product_id, quantity, size } = req.body;
+            const userId = req.user?._id || req.session?.passport?.user;
+
+            if (!product_id || !size) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Product ID and Size are required'
+                });
+            }
+
+            await cartService.addToCart(userId, product_id, quantity, size, req.session);
+
+            res.json({
+                success: true,
+                message: 'Item added to cart successfully'
+            });
+        } catch (error) {
+            console.error('Add to cart error:', error);
+            res.status(500).json({
+                success: false,
+                message: error.message || 'Error adding item to cart'
+            });
+        }
+    }
+
+    async updateQuantity(req, res) {
+        try {
+            const { itemId } = req.params;
+            const { quantity, size, product_id } = req.body;
+            const userId = req.user?._id || req.session?.passport?.user;
+
+            const totals = await cartService.updateQuantity(
+                userId, 
+                itemId, 
+                quantity, 
+                size, 
+                product_id, 
+                req.session
+            );
+
+            res.json({
+                success: true,
+                message: 'Quantity updated',
+                cart: totals
+            });
+        } catch (error) {
+            console.error('Error updating quantity:', error);
+            res.status(500).json({
+                success: false,
+                message: error.message || 'Could not update quantity'
+            });
+        }
+    }
+
+    async removeItem(req, res) {
+        try {
+            const { itemId } = req.params;
+            const userId = req.user?._id || req.session?.passport?.user;
+
+            const totals = await cartService.removeItem(userId, itemId, req.session);
+
+            res.json({
+                success: true,
+                message: 'Item removed from cart',
+                cart: totals
+            });
+        } catch (error) {
+            console.error('Error removing item:', error);
+            res.status(500).json({
+                success: false,
+                message: error.message || 'Could not remove item'
+            });
+        }
+    }
+
+    async getCartCount(req, res) {
+        try {
+            const userId = req.user?._id || req.session?.passport?.user;
+            const count = await cartService.getCartCount(userId, req.session);
+            
+            res.json({
+                success: true,
+                count: count
+            });
+        } catch (error) {
+            console.error('Error getting cart count:', error);
+            res.status(500).json({
+                success: false,
+                count: 0
+            });
+        }
+    }
+}
+
+module.exports = new CartController();

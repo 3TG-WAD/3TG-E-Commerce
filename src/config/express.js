@@ -10,12 +10,13 @@ const dataMiddleware = require('../middleware/data.middleware');
 const categoryController = require('../modules/product/controllers/category.controller');
 const Category = require('../modules/product/models/category');
 const Manufacturer = require('../modules/product/models/manufacturer');
+const sessionMiddleware = require('./session');
 
 const configureExpress = (app) => {
   // Middleware
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
-
+  app.use(sessionMiddleware);
   // View engine setup
   app.use(expressLayouts);
   app.set('view engine', 'ejs');
