@@ -199,7 +199,6 @@ class ProductFilterService {
     }
 
     renderProducts(products) {
-        console.log('Rendering products:', products); // Debug log
 
         if (!this.productsGrid || !products) {
             console.error('Missing productsGrid or products data');

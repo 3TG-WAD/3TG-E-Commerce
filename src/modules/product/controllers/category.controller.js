@@ -22,14 +22,6 @@ const categoryController = {
             const page = parseInt(req.query.page) || 1;
             const limit = 9;
             
-            console.log('Request params:', { 
-                slug, 
-                page, 
-                sort: req.query.sort,
-                manufacturer: req.query.manufacturer 
-            });
-
-            // Thêm xử lý đặc biệt cho route "all"
             let category;
             if (slug === 'all') {
                 category = {
@@ -259,8 +251,6 @@ const categoryController = {
         try {
             const { categoryId } = req.params;
             const { sort = 'popular' } = req.query;
-            
-            console.log('Sort request:', { categoryId, sort }); // Log request params
 
             // Lấy category theo slug
             const category = await Category.findOne({ slug: categoryId });
@@ -268,7 +258,6 @@ const categoryController = {
                 console.log('Category not found:', categoryId);
                 return res.status(404).json({ message: 'Category not found' });
             }
-            console.log('Found category:', category.category_name);
 
             // Xác định cách sắp xếp
             let sortQuery = {};
