@@ -193,46 +193,58 @@ class CartService {
     }
 
     async removeItem(userId, itemId, session) {
-        const cart = await Cart.findOne({ user_id: userId });
-        if (!cart) {
-            throw new Error('Cart not found');
+        if (userId) {
+            const cart = await Cart.findOne({ user_id: userId });
+            if (!cart) {
+                throw new Error('Cart not found');
+            }
+
+            const cartItem = await CartItem.findOneAndDelete({
+                _id: itemId,
+                cart_id: cart._id
+            });
+
+            if (!cartItem) {
+                throw new Error('Item not found in cart');
+            }
+
+            const allItems = await CartItem.find({ cart_id: cart._id });
+            const totals = this._calculateTotals(allItems);
+
+            cart.total_items = totals.total_items;
+            cart.total_price = totals.total_price;
+            await cart.save();
+
+            return totals;
+        } else {
+            if (!session.cartItems) {
+                throw new Error('Cart not found');
+            }
+
+            const itemIndex = session.cartItems.findIndex(item => 
+                item.product_id === itemId
+            );
+
+            if (itemIndex === -1) {
+                throw new Error('Item not found in cart');
+            }
+
+            session.cartItems.splice(itemIndex, 1);
+
+            const totals = {
+                total_items: session.cartItems.reduce((sum, item) => sum + item.quantity, 0),
+                total_price: session.cartItems.reduce((sum, item) => sum + (item.final_price * item.quantity), 0)
+            };
+
+            return totals;
         }
+    }
 
-        const cartItem = await CartItem.findOneAndDelete({
-            _id: itemId,
-            cart_id: cart._id
-        });
-
-        if (!cartItem) {
-            throw new Error('Item not found in cart');
-        }
-
-        const allItems = await CartItem.find({ cart_id: cart._id });
-        const totals = allItems.reduce((acc, item) => ({
-            total_items: acc.total_items + item.quantity,
-            total_price: acc.total_price + (item.final_price * item.quantity)
-        }), { total_items: 0, total_price: 0 });
-
-        cart.total_items = totals.total_items;
-        cart.total_price = totals.total_price;
-        await cart.save();
-
-        if (!userId && session) {
-            session.cart = allItems.map(item => ({
-                product_id: item.product_id,
-                variant_id: item.variant_id,
-                quantity: item.quantity,
-                price: item.price,
-                final_price: item.final_price,
-                discount: item.discount,
-                size: item.size,
-                product_name: item.product_name,
-                photos: item.photos
-            }));
-            await session.save();
-        }
-
-        return { total_items: cart.total_items, total_price: cart.total_price };
+    _calculateTotals(items) {
+        return {
+            total_items: items.reduce((sum, item) => sum + item.quantity, 0),
+            total_price: items.reduce((sum, item) => sum + (item.final_price * item.quantity), 0)
+        };
     }
 
     async getCartCount(userId, session) {
