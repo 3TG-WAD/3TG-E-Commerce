@@ -25,11 +25,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     window.location.href = data.paymentUrl;
                 } else {
-                    showNotification(data.message || 'Có lỗi xảy ra khi tạo thanh toán', 'error');
+                    showNotification(data.message || 'Payment failed', 'error');
                 }
             } catch (error) {
                 console.error('Payment error:', error);
-                showNotification('Có lỗi xảy ra khi tạo thanh toán', 'error');
+                showNotification('Payment failed', 'error');
             }
         });
     } else {
