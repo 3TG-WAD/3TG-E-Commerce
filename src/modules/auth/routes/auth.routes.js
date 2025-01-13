@@ -19,4 +19,8 @@ router.post('/forgot-password', isNotAuthenticated, authController.forgotPasswor
 router.get('/reset-password/:token', isNotAuthenticated, authController.renderResetPassword);
 router.post('/reset-password', isNotAuthenticated, authController.resetPassword);
 
+// Check Username and Email routes
+router.post('/check-username', authController.checkUsername);
+router.post('/check-email', authController.checkEmail);
+
 module.exports = router;
