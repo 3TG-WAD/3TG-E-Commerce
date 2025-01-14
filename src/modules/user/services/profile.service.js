@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const s3Service = require('../../../modules/s3/services/s3.service');
+const cacheService = require('../../../modules/cache/redis.service');
 
 class ProfileService {
   async updateProfile(userId, profileData) {
@@ -40,6 +41,9 @@ class ProfileService {
     user.gender = gender || user.gender;
 
     await user.save();
+
+    // Xóa cache khi update profile
+    await cacheService.del(`user:${userId}`);
 
     return {
       username: user.username,
@@ -92,6 +96,30 @@ class ProfileService {
     await user.save();
 
     return true;
+  }
+
+  async getProfile(userId) {
+    try {
+      // Kiểm tra cache trước
+      const cachedUser = await cacheService.get(`user:${userId}`);
+      if (cachedUser) {
+        console.log('User found in cache');
+        return cachedUser;
+      }
+
+      // Nếu không có trong cache, query từ DB
+      const user = await User.findById(userId);
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      // Lưu vào cache trong 1 giờ
+      await cacheService.set(`user:${userId}`, user, 3600);
+
+      return user;
+    } catch (error) {
+      throw error;
+    }
   }
 }
 

@@ -17,9 +17,12 @@ const upload = multer({
 class ProfileController {
   async getProfilePage(req, res) {
     try {
+      // Lấy thông tin user từ cache hoặc DB
+      const userProfile = await profileService.getProfile(req.user._id);
+      
       res.render('user/profile', {
         title: 'My Profile',
-        user: req.user
+        user: userProfile
       });
     } catch (error) {
       res.status(500).render('error/500', {
