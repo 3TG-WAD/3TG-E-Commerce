@@ -6,5 +6,6 @@ const { isAuthenticated } = require('../../../middleware/auth.middleware');
 router.get('/profile', isAuthenticated, profileController.getProfilePage);
 router.post('/profile/update', isAuthenticated, profileController.updateProfile);
 router.post('/profile/update-avatar', isAuthenticated, profileController.updateAvatar);
+router.post('/profile/change-password', isAuthenticated, profileController.changePassword);
 
 module.exports = router;

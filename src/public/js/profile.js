@@ -227,6 +227,69 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Thêm xử lý đổi mật khẩu
+    const changePasswordBtn = document.getElementById('changePasswordBtn');
+    const changePasswordModal = document.getElementById('changePasswordModal');
+    const changePasswordForm = document.getElementById('changePasswordForm');
+    const cancelPasswordChange = document.getElementById('cancelPasswordChange');
+
+    if (changePasswordBtn) {
+        changePasswordBtn.addEventListener('click', () => {
+            changePasswordModal.classList.remove('hidden');
+            changePasswordModal.classList.add('flex');
+        });
+    }
+
+    if (cancelPasswordChange) {
+        cancelPasswordChange.addEventListener('click', () => {
+            changePasswordModal.classList.add('hidden');
+            changePasswordModal.classList.remove('flex');
+            changePasswordForm.reset();
+        });
+    }
+
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(changePasswordForm);
+            const newPassword = formData.get('newPassword');
+            const confirmPassword = formData.get('confirmPassword');
+
+            if (newPassword !== confirmPassword) {
+                showNotification('New password does not match', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/profile/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        currentPassword: formData.get('currentPassword'),
+                        newPassword: newPassword
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('Password changed successfully', 'success');
+                    changePasswordModal.classList.add('hidden');
+                    changePasswordModal.classList.remove('flex');
+                    changePasswordForm.reset();
+                } else {
+                    showNotification(data.message || 'Failed to change password', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('An error occurred while changing password', 'error');
+            }
+        });
+    }
 });
 
 // Toast notification function
