@@ -27,22 +27,29 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_IMAGE }}:${{ github.sha }}
+          tags: |
+            azzurriii/six-t-ecommerce:latest
+            azzurriii/six-t-ecommerce:${{ github.sha }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Create deployment package
         run: |
-          mkdir deployment
-          docker create --name temp_container ${{ secrets.DOCKER_IMAGE }}:${{ github.sha }}
-          docker cp temp_container:/app/ ./deployment
+          mkdir -p deployment
+          docker create --name temp_container azzurriii/six-t-ecommerce:${{ github.sha }}
+          docker cp temp_container:/app/. ./deployment/
           docker rm temp_container
         
       - name: Deploy to S3
         run: |
           aws s3 sync ./deployment s3://${{ secrets.S3_BUCKET_NAME }}/deployment/ --delete
+
+      - name: Clean up
+        if: always()
+        run: |
+          rm -rf deployment
