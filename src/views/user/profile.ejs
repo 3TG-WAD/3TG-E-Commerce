@@ -39,12 +39,26 @@
                         </div>
 
                         <!-- Edit Button -->
-                        <button type="button" 
+                        <div class="flex justify-end space-x-4 mb-6">
+                            <% if (user.authProvider !== 'google') { %>
+                                <button
+                                    id="changePasswordBtn"
+                                    class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    Change Password
+                                </button>
+                            <% } %>
+                            <button
                                 id="editProfileBtn"
-                                class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                            <i class="fas fa-edit mr-2"></i>
-                            Edit Profile
-                        </button>
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+                            >
+                                Edit Profile
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -146,6 +160,40 @@
                 </svg>
             </div>
             <p id="toast-message" class="text-sm text-gray-800"></p>
+        </div>
+    </div>
+
+    <!-- Modal đổi mật khẩu -->
+    <div id="changePasswordModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-96">
+            <h3 class="text-lg font-medium mb-4">Đổi mật khẩu</h3>
+            <form id="changePasswordForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Current Password</label>
+                    <input type="password" name="currentPassword" required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">New Password</label>
+                    <input type="password" name="newPassword" required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                    <input type="password" name="confirmPassword" required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black">
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" id="cancelPasswordChange"
+                        class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-black text-white rounded-md text-sm font-medium hover:bg-gray-800">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </body>
