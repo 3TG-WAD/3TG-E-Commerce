@@ -5,6 +5,7 @@ const Variant = require('../models/variant');
 const Review = require('../models/review');
 const multer = require('multer');
 const s3Service = require('../../s3/services/s3.service');
+const searchService = require('../services/search.service');
 
 const upload = multer({
     storage: multer.memoryStorage(),
@@ -355,6 +356,34 @@ class ProductController {
             res.status(500).json({
                 success: false,
                 message: error.message || 'Error adding review'
+            });
+        }
+    }
+
+    searchProducts = async (req, res) => {
+        try {
+            const { query } = req.query;
+            if (!query || query.length < 2) {
+                return res.json({ success: true, products: [] });
+            }
+
+            const results = searchService.search(query);
+            
+            // Format giá tiền
+            const formattedResults = results.map(product => ({
+                ...product,
+                formattedPrice: formatToVND(product.finalPrice)
+            }));
+
+            res.json({ 
+                success: true, 
+                products: formattedResults 
+            });
+        } catch (error) {
+            console.error('Search error:', error);
+            res.status(500).json({ 
+                success: false, 
+                message: error.message 
             });
         }
     }

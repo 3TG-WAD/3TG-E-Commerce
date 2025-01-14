@@ -23,5 +23,6 @@ router.get('/api/products/:id/reviews', productController.getReviewsPartial);
 router.get('/api/products/:id/recommended', productController.getRecommendedPartial);
 router.post('/api/products/:id/reviews', isAuthenticated, productController.addReview);
 router.post('/api/reviews/upload-images', isAuthenticated, upload.array('images', 5), productController.uploadImages);
+router.get('/api/search', productController.searchProducts);
 
 module.exports = router;
