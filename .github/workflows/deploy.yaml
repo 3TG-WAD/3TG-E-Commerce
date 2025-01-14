@@ -13,11 +13,13 @@ jobs:
       - name: Debug Secrets
         run: |
           echo "Checking environment variables..."
-          echo "DOCKERHUB_USERNAME exists: ${{ secrets.SECRETS != '' }}"
-          echo "AWS_ACCESS_KEY_ID exists: ${{ secrets.AWS_ACCESS_KEY_ID != '' }}"
-          echo "AWS_SECRET_ACCESS_KEY exists: ${{ secrets.AWS_SECRET_ACCESS_KEY != '' }}"
-          echo "AWS_REGION exists: ${{ secrets.AWS_REGION != '' }}"
-          echo "S3_BUCKET_NAME exists: ${{ secrets.S3_BUCKET_NAME != '' }}"
+          echo "SECRETS exists: ${{ secrets.SECRETS != '' }}"
+          echo "DOCKERHUB_USERNAME exists: ${{ secrets.SECRETS.DOCKERHUB_USERNAME != '' }}"
+          echo "DOCKERHUB_TOKEN exists: ${{ secrets.SECRETS.DOCKERHUB_TOKEN != '' }}"
+          echo "AWS_ACCESS_KEY_ID exists: ${{ secrets.SECRETS.AWS_ACCESS_KEY_ID != '' }}"
+          echo "AWS_SECRET_ACCESS_KEY exists: ${{ secrets.SECRETS.AWS_SECRET_ACCESS_KEY != '' }}"
+          echo "AWS_REGION exists: ${{ secrets.SECRETS.AWS_REGION != '' }}"
+          echo "S3_BUCKET_NAME exists: ${{ secrets.SECRETS.S3_BUCKET_NAME != '' }}"
 
       - name: Checkout code
         uses: actions/checkout@v3
@@ -43,9 +45,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.SECRETS.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.SECRETS.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.SECRETS.AWS_REGION }}
 
       - name: Create deployment package
         run: |
@@ -56,7 +58,7 @@ jobs:
         
       - name: Deploy to S3
         run: |
-          aws s3 sync ./deployment s3://${{ secrets.S3_BUCKET_NAME }}/deployment/ --delete
+          aws s3 sync ./deployment s3://${{ secrets.SECRETS.S3_BUCKET_NAME }}/deployment/ --delete
 
       - name: Clean up
         if: always()
