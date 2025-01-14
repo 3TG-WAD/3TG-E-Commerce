@@ -10,6 +10,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Debug Secrets
+        run: |
+          echo "Checking environment variables..."
+          echo "DOCKERHUB_USERNAME exists: ${{ secrets.SECRETS != '' }}"
+          echo "AWS_ACCESS_KEY_ID exists: ${{ secrets.AWS_ACCESS_KEY_ID != '' }}"
+          echo "AWS_SECRET_ACCESS_KEY exists: ${{ secrets.AWS_SECRET_ACCESS_KEY != '' }}"
+          echo "AWS_REGION exists: ${{ secrets.AWS_REGION != '' }}"
+          echo "S3_BUCKET_NAME exists: ${{ secrets.S3_BUCKET_NAME != '' }}"
+
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -19,8 +28,8 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.SECRETS.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.SECRETS.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
