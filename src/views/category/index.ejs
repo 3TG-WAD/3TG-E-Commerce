@@ -165,34 +165,3 @@
     </div>
   </div>
 </div>
-
-<script type="module">
-    console.log('Loading filter service...'); // Debug script loading
-    import ProductFilterService from '../../modules/product/services/filter.service.js';
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log('DOM loaded, initializing service...'); // Debug DOM loaded
-        new ProductFilterService();
-    });
-</script>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const mobileFilterToggle = document.getElementById('mobileFilterToggle');
-    const filterForm = document.getElementById('filterForm');
-
-    if (mobileFilterToggle && filterForm) {
-      mobileFilterToggle.addEventListener('click', function() {
-        filterForm.classList.toggle('hidden');
-      });
-
-      window.addEventListener('resize', function() {
-        if (window.innerWidth >= 1024) {
-          filterForm.classList.remove('hidden');
-        } else {
-          filterForm.classList.add('hidden');
-        }
-      });
-    }
-  });
-</script>
