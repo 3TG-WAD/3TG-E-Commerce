@@ -44,7 +44,6 @@ class OrderController {
     // Get orders API
     async getOrders(req, res) {
         try {
-            console.log('getOrders called, user:', req.user);
             const { status } = req.query;
             const orders = await orderService.getOrdersByUser(req.user._id, status);
             res.json({ success: true, orders });

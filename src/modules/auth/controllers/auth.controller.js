@@ -156,11 +156,8 @@ exports.startGoogleAuth = async (req, res, next) => {
         // Lưu cart vào biến global với session ID làm key
         const sessionId = req.session.id;
         const cartItems = req.session.cartItems || [];
-        console.log('Current session cartItems:', cartItems);
         
         tempGlobalCart.set(sessionId, cartItems);
-        console.log('Saved cart to global storage for session:', sessionId);
-        console.log('Cart items:', tempGlobalCart.get(sessionId));
         
         next();
     } catch (error) {
@@ -175,7 +172,6 @@ exports.googleCallback = async (req, res) => {
         
         // Lấy cart từ global storage không phụ thuộc session ID
         const guestCart = global.tempGoogleCart || [];
-        console.log('Retrieved cart from global storage:', guestCart);
         
         // Tạo session mới
         req.session.regenerate(async (err) => {
@@ -190,8 +186,6 @@ exports.googleCallback = async (req, res) => {
                 
                 // Merge cart nếu có
                 if (guestCart && guestCart.length > 0) {
-                    console.log('Attempting to merge cart for user:', req.user._id);
-                    console.log('Cart items to merge:', guestCart);
                     await mergeCart(req.user._id, guestCart);
                     console.log('Cart merged successfully');
                 } else {

@@ -16,17 +16,6 @@
       <% if (cartItems && cartItems.length> 0) { %>
         <div class="space-y-6">
           <% cartItems.forEach(item=> { %>
-            <!-- Debug info -->
-            <script>
-              console.log('Cart Item:', {
-                item: '<%= JSON.stringify(item) %>',
-                hasId: '<%= !!item._id %>',
-                id: '<%= item._id %>',
-                product: '<%= item.product_id %>',
-                quantity: '<%= item.quantity %>'
-              });
-            </script>
-
             <div class="flex items-center gap-6 pb-6 border-b border-gray-200" data-cart-item="<%= item.id %>"
               data-size="<%= item.size %>">
               <!-- Product Image -->

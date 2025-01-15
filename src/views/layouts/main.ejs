@@ -13,16 +13,7 @@
     <script>
         window.addEventListener('DOMContentLoaded', () => {
             const styleSheets = document.styleSheets;
-            console.log('Loaded stylesheets:', styleSheets.length);
-            for(let i = 0; i < styleSheets.length; i++) {
-                console.log(`Stylesheet ${i}:`, styleSheets[i].href);
-            }
-
             const cssLink = document.querySelector('link[href="/css/stylesheet.css"]');
-            console.log('CSS Link:', cssLink);
-            if (cssLink) {
-                console.log('CSS href:', cssLink.href);
-            }
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -61,5 +52,6 @@
     <script src="/js/cart.js"></script>
     <script src="/js/payment.js"></script>
     <script src="/js/review.js"></script>
+    <script src="/js/alpine.js"></script>
 </body>
 </html>

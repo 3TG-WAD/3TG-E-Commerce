@@ -9,16 +9,20 @@
   <div class="flex flex-col lg:flex-row gap-8">
     <!-- Filters Sidebar -->
     <div class="w-full lg:w-64 lg:flex-shrink-0">
+      <!-- Filter Header with Mobile Toggle -->
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-base font-medium">Filters</h2>
-        <!-- Mobile filter toggle -->
-        <button class="lg:hidden text-gray-500" id="mobileFilterToggle">
+        <button type="button"
+                id="mobileFilterToggle"
+                class="lg:hidden text-gray-500 hover:text-gray-700">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M4 6h16M4 12h16m-7 6h7"/>
           </svg>
         </button>
       </div>
 
+      <!-- Filter Form -->
       <form id="filterForm" class="hidden lg:block">
         <!-- Categories -->
         <div class="mb-6">
@@ -51,34 +55,95 @@
         <!-- Sort By -->
         <div class="mb-6">
           <h3 class="font-medium mb-3">Sort By</h3>
-          <select name="sort" id="sortBy" class="w-full border-gray-300 rounded-md text-sm">
-            <option value="popular" <%= filters.sort === 'popular' ? 'selected' : '' %>>Most Popular</option>
-            <option value="newest" <%= filters.sort === 'newest' ? 'selected' : '' %>>Newest</option>
-            <option value="price-asc" <%= filters.sort === 'price-asc' ? 'selected' : '' %>>Price: Low to High</option>
-            <option value="price-desc" <%= filters.sort === 'price-desc' ? 'selected' : '' %>>Price: High to Low</option>
-          </select>
+          <div class="relative">
+            <select name="sort" 
+                    id="sortBy" 
+                    class="w-full appearance-none bg-white border border-gray-300 rounded-md py-2.5 px-3 text-sm
+                           focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent
+                           cursor-pointer pr-10">
+              <option value="name-asc" <%= filters.sort === 'name-asc' ? 'selected' : '' %>>Name: A to Z</option>
+              <option value="name-desc" <%= filters.sort === 'name-desc' ? 'selected' : '' %>>Name: Z to A</option>
+              <option value="price-asc" <%= filters.sort === 'price-asc' ? 'selected' : '' %>>Price: Low to High</option>
+              <option value="price-desc" <%= filters.sort === 'price-desc' ? 'selected' : '' %>>Price: High to Low</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-gray-500">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Price Range -->
+        <div class="mb-6">
+          <h3 class="font-medium mb-3">Price Range</h3>
+          <div class="space-y-3">
+            <div class="relative">
+              <label class="text-sm text-gray-600 block mb-1.5">Min Price</label>
+              <div class="relative">
+                <input type="number" 
+                       name="minPrice" 
+                       id="minPrice"
+                       min="0"
+                       value="<%= filters.minPrice || '' %>"
+                       class="w-full bg-white border border-gray-300 rounded-md py-2.5 px-3 text-sm
+                              focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent
+                              placeholder-gray-400 pr-16 [appearance:textfield]
+                              [&::-webkit-outer-spin-button]:appearance-none 
+                              [&::-webkit-inner-spin-button]:appearance-none"
+                       placeholder="0">
+                <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">VND</div>
+              </div>
+            </div>
+            <div class="relative">
+              <label class="text-sm text-gray-600 block mb-1.5">Max Price</label>
+              <div class="relative">
+                <input type="number" 
+                       name="maxPrice" 
+                       id="maxPrice"
+                       min="0"
+                       value="<%= filters.maxPrice || '' %>"
+                       class="w-full bg-white border border-gray-300 rounded-md py-2.5 px-3 text-sm
+                              focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent
+                              placeholder-gray-400 pr-16 [appearance:textfield]
+                              [&::-webkit-outer-spin-button]:appearance-none 
+                              [&::-webkit-inner-spin-button]:appearance-none"
+                       placeholder="No limit">
+                <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">VND</div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Manufacturers -->
         <div class="mb-6">
           <h3 class="font-medium mb-3">Brands</h3>
-          <div class="space-y-2">
+          <div class="space-y-0.5 max-h-48 overflow-y-auto 
+                      scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent
+                      hover:scrollbar-thumb-gray-400 pr-2">
             <% manufacturers.forEach(brand => { %>
-              <label class="flex items-center">
+              <label class="flex items-center py-2 px-2 hover:bg-gray-50 rounded-md cursor-pointer
+                            transition-colors duration-150">
                 <input type="checkbox" 
                        name="manufacturer" 
                        value="<%= brand.manufacturer_id %>"
-                       class="form-checkbox"
+                       class="w-4 h-4 text-black rounded border-gray-300 
+                              focus:ring-black focus:ring-2 focus:ring-offset-0"
                        <%= filters.manufacturers?.includes(brand.manufacturer_id) ? 'checked' : '' %>>
-                <span class="ml-2"><%= brand.name %></span>
+                <span class="ml-2.5 text-sm text-gray-700"><%= brand.name %></span>
               </label>
             <% }); %>
           </div>
         </div>
 
+        <!-- Apply Filters Button -->
         <button type="submit" 
                 id="applyFilters"
-                class="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800">
+                class="w-full bg-black text-white py-2.5 rounded-md 
+                       hover:bg-gray-800 active:bg-gray-900
+                       transition duration-150 ease-in-out
+                       focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black
+                       text-sm font-medium">
           Apply Filters
         </button>
       </form>
