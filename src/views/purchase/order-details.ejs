@@ -47,7 +47,7 @@
                                             <%= formatCurrency(item.price) %>
                                         </p>
                                         <p class="text-base font-medium text-gray-900">
-                                            <%= formatCurrency(item.price - item.discount) %>
+                                            <%= formatCurrency((item.price - item.discount/100*item.price)*item.quantity) %>
                                         </p>
                                     <% } else { %>
                                         <p class="text-base font-medium text-gray-900">
@@ -70,13 +70,13 @@
                             <span class="font-medium text-gray-900"><%= formatCurrency(order.total_amount) %></span>
                         </div>
                         <div class="flex justify-between text-sm text-green-600">
-                            <span>Discount</span>
-                            <span>-<%= formatCurrency(order.items.reduce((total, item) => total + item.discount, 0)) %></span>
+                            <span>Shipping</span>
+                            <span><%= formatCurrency(15000) %></span>
                         </div>
                         <div class="pt-3 border-t border-gray-200">
                             <div class="flex justify-between">
                                 <span class="text-base font-medium text-gray-900">Total</span>
-                                <span class="text-base font-medium text-gray-900"><%= formatCurrency(order.total_amount) %></span>
+                                <span class="text-base font-medium text-gray-900"><%= formatCurrency(order.total_amount + 15000) %></span>
                             </div>
                         </div>
                     </div>
