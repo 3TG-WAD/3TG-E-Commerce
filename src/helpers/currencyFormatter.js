@@ -1,5 +1,5 @@
 const formatToVND = (number) => {
-  if (!number) return 'Liên hệ';
+  if (!number) return 'Comming Soon';
   
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',

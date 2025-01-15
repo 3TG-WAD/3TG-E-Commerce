@@ -22,6 +22,10 @@ const categoryController = {
             const page = parseInt(req.query.page) || 1;
             const limit = 9;
             
+            // Add price range to filters
+            const minPrice = req.query.minPrice ? parseInt(req.query.minPrice) : null;
+            const maxPrice = req.query.maxPrice ? parseInt(req.query.maxPrice) : null;
+
             let category;
             if (slug === 'all') {
                 category = {
@@ -63,41 +67,43 @@ const categoryController = {
             });
 
             // 3. Tính giá và apply sort
-            const productsWithPrices = await Promise.all(products.map(async (product) => {
+            let productsWithPrices = await Promise.all(products.map(async (product) => {
                 const productVariants = variants.filter(v => v.product_id === product.product_id);
-                const cheapestVariant = productVariants.reduce((min, curr) => 
-                    (!min || curr.price < min.price) ? curr : min
-                , null);
-
-                // Nhân 1000 cho giá VND
-                const price = cheapestVariant ? cheapestVariant.price * 1000 : 0;
-                const finalPrice = cheapestVariant ? 
-                    price * (1 - cheapestVariant.discount/100) : 0;
-
+                const priceInfo = categoryController._calculateProductPrice(productVariants);
                 return {
                     ...product.toObject(),
-                    price: price,
-                    discount: cheapestVariant ? cheapestVariant.discount : 0,
-                    finalPrice: finalPrice
+                    price: priceInfo.price,
+                    discount: priceInfo.discount,
+                    finalPrice: priceInfo.finalPrice
                 };
             }));
 
+            // Apply price range filter
+            if (minPrice !== null || maxPrice !== null) {
+                productsWithPrices = productsWithPrices.filter(product => {
+                    if (!product) return false;
+                    const price = product.finalPrice;
+                    if (minPrice !== null && price < minPrice) return false;
+                    if (maxPrice !== null && price > maxPrice) return false;
+                    return true;
+                });
+            }
+
             // 4. Sort sản phẩm đã filter
-            let sortedProducts;
+            let sortedProducts = [...productsWithPrices]; // Create a copy to avoid mutation
             switch(currentSort) {
+                case 'name-asc':
+                    sortedProducts = sortedProducts.sort((a, b) => a.product_name.localeCompare(b.product_name));
+                    break;
+                case 'name-desc':
+                    sortedProducts = sortedProducts.sort((a, b) => b.product_name.localeCompare(a.product_name));
+                    break;
                 case 'price-asc':
-                    sortedProducts = productsWithPrices.sort((a, b) => a.finalPrice - b.finalPrice);
+                    sortedProducts = sortedProducts.sort((a, b) => a.finalPrice - b.finalPrice);
                     break;
                 case 'price-desc':
-                    sortedProducts = productsWithPrices.sort((a, b) => b.finalPrice - a.finalPrice);
+                    sortedProducts = sortedProducts.sort((a, b) => b.finalPrice - a.finalPrice);
                     break;
-                case 'newest':
-                    sortedProducts = productsWithPrices.sort((a, b) => 
-                        new Date(b.creation_time) - new Date(a.creation_time));
-                    break;
-                case 'popular':
-                default:
-                    sortedProducts = productsWithPrices.sort((a, b) => b.sold_quantity - a.sold_quantity);
             }
 
             // 5. Phân trang sau khi đã filter và sort
@@ -122,7 +128,9 @@ const categoryController = {
                 manufacturers,
                 filters: {
                     sort: currentSort,
-                    manufacturers: selectedManufacturers
+                    manufacturers: selectedManufacturers,
+                    minPrice,
+                    maxPrice
                 },
                 pagination: {
                     current: page,
@@ -409,6 +417,20 @@ const categoryController = {
             res.status(500).render('500');
         }
     },
+
+    _calculateProductPrice(variants) {
+        if (!variants?.length) return { price: 0, discount: 0, finalPrice: 0 };
+        
+        const cheapestVariant = variants.reduce((min, curr) => 
+            (!min || curr.price < min.price) ? curr : min
+        , null);
+
+        const price = cheapestVariant ? cheapestVariant.price * 1000 : 0;
+        const discount = cheapestVariant ? cheapestVariant.discount : 0;
+        const finalPrice = price * (1 - discount/100);
+
+        return { price, discount, finalPrice };
+    }
 };
 
 module.exports = categoryController;
