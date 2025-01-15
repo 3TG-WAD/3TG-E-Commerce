@@ -1,52 +1,61 @@
-<div class="min-h-screen bg-gray-100 py-6">
-    <div class="container mx-auto px-4">
+<div class="min-h-screen bg-gray-50 py-6 sm:py-8">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <!-- Tabs -->
-        <div class="bg-white rounded-lg shadow mb-4">
-            <div id="orderTabs" class="flex space-x-1 bg-gray-100 p-1 rounded-xl mb-6">
+        <div class="bg-white rounded-2xl shadow-sm mb-6">
+            <div id="orderTabs" class="flex flex-wrap sm:flex-nowrap gap-2 p-2 bg-gray-50 rounded-xl">
                 <button data-tab="all" 
-                        class="tab-button flex-1 py-3 px-6 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none
-                               active-tab">
-                    All
+                        class="tab-button flex-1 min-w-[120px] py-2.5 px-4 text-sm font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 active-tab">
+                    All Orders
                 </button>
                 <button data-tab="pending" 
-                        class="tab-button flex-1 py-3 px-6 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none">
+                        class="tab-button flex-1 min-w-[120px] py-2.5 px-4 text-sm font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
                     Pending
                 </button>
                 <button data-tab="processing" 
-                        class="tab-button flex-1 py-3 px-6 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none">
+                        class="tab-button flex-1 min-w-[120px] py-2.5 px-4 text-sm font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
                     Processing
                 </button>
                 <button data-tab="shipping" 
-                        class="tab-button flex-1 py-3 px-6 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none">
+                        class="tab-button flex-1 min-w-[120px] py-2.5 px-4 text-sm font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
                     Shipping
                 </button>
                 <button data-tab="completed" 
-                        class="tab-button flex-1 py-3 px-6 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none">
+                        class="tab-button flex-1 min-w-[120px] py-2.5 px-4 text-sm font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
                     Completed
                 </button>
                 <button data-tab="cancelled" 
-                        class="tab-button flex-1 py-3 px-6 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none">
+                        class="tab-button flex-1 min-w-[120px] py-2.5 px-4 text-sm font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
                     Cancelled
                 </button>
             </div>
         </div>
 
-
         <!-- Search Bar -->
-        <div class="relative max-w-2xl mx-auto mb-6">
-            <input type="text" 
-                   class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 
-                          focus:outline-none focus:border-blue-500 focus:ring-1 
-                          focus:ring-blue-500 transition-colors"
-                   placeholder="Search by Order ID, Shop name or Product name">
+        <div class="relative max-w-2xl mx-auto mb-8">
+            <div class="relative">
+                <input type="text" 
+                       class="w-full px-4 pl-10 py-3 text-sm rounded-xl border border-gray-200 
+                              focus:outline-none focus:border-blue-500 focus:ring-1 
+                              focus:ring-blue-500 transition-colors bg-white"
+                       placeholder="Search orders...">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <i class="fas fa-search"></i>
+                </span>
+            </div>
         </div>
 
         <!-- Content Area -->
-        <div id="purchaseContent" class="purchase-content">
+        <div id="purchaseContent" class="purchase-content space-y-4">
             <!-- Empty State -->
-            <div class="empty-state bg-white rounded-lg shadow p-8 text-center">
-                <img src="/images/orders/empty-order.png" alt="No Orders" class="w-11 h-11 mx-auto mb-4">
-                <p class="text-gray-500">Empty</p>
+            <div class="empty-state bg-white rounded-2xl shadow-sm p-8 text-center">
+                <div class="max-w-sm mx-auto">
+                    <img src="/images/orders/empty-order.png" alt="No Orders" class="w-24 h-24 mx-auto mb-4">
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">No Orders Yet</h3>
+                    <p class="text-gray-500 mb-6">Start shopping and your orders will appear here</p>
+                    <a href="/products" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Browse Products
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -103,7 +112,4 @@
         </div>
     </div>
 </template>
-<script>
-    console.log('Purchase page initializing...'); // Debug log
-</script>
 <script src="/js/purchase.js" defer></script>

@@ -58,7 +58,6 @@ const categoryController = {
             }
             
             const products = await Product.find(baseQuery);
-            console.log('Found products after filter:', products.length);
 
             // 2. Lấy variants cho sản phẩm đã filter
             const productIds = products.map(p => p.product_id);
@@ -290,7 +289,6 @@ const categoryController = {
                 category_id: category.category_id 
             }).sort(sortQuery);
 
-            console.log('Found products:', products.length);
             console.log('First few products base prices:', products.slice(0, 3).map(p => ({
                 name: p.product_name,
                 base_price: p.base_price

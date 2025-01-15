@@ -7,8 +7,6 @@ const authController = require("../controllers/auth.controller");
 const saveCartMiddleware = (req, res, next) => {
     const sessionId = req.session.id;
     const cartItems = req.session.cartItems || [];
-    console.log('Current session ID before Google auth:', sessionId);
-    console.log('Current cart items before Google auth:', cartItems);
     
     // Lưu vào global storage với key cố định
     global.tempGoogleCart = cartItems;  // Không dùng Map nữa

@@ -15,12 +15,9 @@ class OrderService {
       const orders = await Order.find(query)
         .sort({ created_at: -1 });
       
-      console.log('Query:', query);
-      console.log('Found orders:', orders);
 
       return orders;
     } catch (error) {
-      console.error('Error in getOrdersByUser:', error);
       throw error;
     }
   }

@@ -3,8 +3,6 @@ const CartItem = require('../modules/cart/models/cartItems');
 
 async function mergeCart(userId, sessionCart) {
     try {
-        console.log('Merging cart for user:', userId);
-        console.log('Session cart items:', sessionCart);
 
         if (!sessionCart || !sessionCart.length) {
             console.log('No session cart items to merge');
@@ -26,7 +24,6 @@ async function mergeCart(userId, sessionCart) {
             if (existingItem) {
                 existingItem.quantity += sessionItem.quantity;
                 await existingItem.save();
-                console.log('Updated existing item:', existingItem);
             } else {
                 const newItem = await CartItem.create({
                     cart_id: userCart._id,
@@ -41,7 +38,6 @@ async function mergeCart(userId, sessionCart) {
                     product_name: sessionItem.product_name,
                     photos: sessionItem.photos
                 });
-                console.log('Created new item:', newItem);
             }
         }
 
