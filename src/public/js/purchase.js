@@ -159,8 +159,8 @@ const getStatusStyle = (status) => {
 const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
-        currency: 'USD'
-    }).format(amount/23000); // Assuming conversion rate 23000 VND = 1 USD
+        currency: 'VND'
+    }).format(amount);
 };
 
 const formatDate = (dateString) => {
@@ -185,7 +185,7 @@ const renderOrderItems = (items) => {
                 ${item.discount > 0 ? `
                     <div class="flex items-center gap-2 justify-end">
                         <span class="text-sm line-through text-gray-400">${formatCurrency(item.price)}</span>
-                        <span class="text-sm text-red-500">-${formatCurrency(item.discount)}</span>
+                        <span class="text-sm text-red-500">-${formatCurrency(item.discount/100*item.price)}</span>
                     </div>
                 ` : ''}
             </div>
